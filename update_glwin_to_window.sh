@@ -23,6 +23,4 @@ sed --separate --in-place -e 's/\bcloseglw)/CloseWindow)/ig' "$@"
 sed --separate --in-place -e 's/\bglw :=/Window :=/ig' "$@"
 }
 
-doit *.pas
-doit *.inc
-doit *.lpr
+doit *.pas *.inc *.lpr
