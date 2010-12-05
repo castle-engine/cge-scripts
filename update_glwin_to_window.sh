@@ -1,5 +1,7 @@
 #!/bin/bash
-set -eu
+set -u
+
+# Don't "set -e", we want to ignore all sed exit status.
 
 doit ()
 {
