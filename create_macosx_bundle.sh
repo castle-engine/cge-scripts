@@ -11,7 +11,9 @@ set -eu
 #
 # $2 is the binary name, must be in current dir.
 #
-# $3 is the icon filename, relative to current dir.
+# $3 is the icons (icns) filename, relative to current dir.
+# http://icns.sourceforge.net/ and svg_to_icns.sh may be useful
+# to create such icon.
 
 appname="$1"
 appfolder=$appname.app

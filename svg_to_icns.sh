@@ -3,7 +3,8 @@ set -eu
 
 # Convert svg image to Mac OS X icns (icons) format.
 # We use inkscape to convert svg to various sizes,
-# then we use png2icns to convert set of png images to final icns.
+# then we use png2icns (http://icns.sourceforge.net/)
+# to convert a set of png images to final icns.
 #
 # $1 is input svg file name, $2 is output icns file name.
 
