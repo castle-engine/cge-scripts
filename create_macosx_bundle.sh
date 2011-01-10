@@ -20,6 +20,8 @@ appfolder=$appname.app
 macosfolder=$appfolder/Contents/MacOS
 plistfile=$appfolder/Contents/Info.plist
 appfile="$2"
+iconfile="$3"
+iconfile_basename=`basename "$iconfile"`
 
 if ! [ -e $appfile ]; then
   echo "$appfile binary does not exist."
@@ -41,31 +43,35 @@ mkdir $appfolder/Contents/Resources
 cp $appfile $macosfolder/$appname
 
 # Copy the resource files to the correct place
-cp "$3" $appfolder/Contents/Resources
+cp "$iconfile" $appfolder/Contents/Resources
 
 # Create PkgInfo file.
 echo "APPL????" >$appfolder/Contents/PkgInfo
 
 # Create information property list file (Info.plist).
-echo '<?xml version="1.0" encoding="UTF-8"?>' >$plistfile
-echo '<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >>$plistfile
-echo '<plist version="1.0">' >>$plistfile
-echo '<dict>' >>$plistfile
-echo '  <key>CFBundleDevelopmentRegion</key>' >>$plistfile
-echo '  <string>English</string>' >>$plistfile
-echo '  <key>CFBundleExecutable</key>' >>$plistfile
-echo '  <string>'$appname'</string>' >>$plistfile
-echo '  <key>CFBundleInfoDictionaryVersion</key>' >>$plistfile
-echo '  <string>6.0</string>' >>$plistfile
-echo '  <key>CFBundlePackageType</key>' >>$plistfile
-echo '  <string>APPL</string>' >>$plistfile
-echo '  <key>CFBundleSignature</key>' >>$plistfile
-echo '  <string>????</string>' >>$plistfile
-echo '  <key>CFBundleVersion</key>' >>$plistfile
-echo '  <string>1.0</string>' >>$plistfile
-echo '  <key>CSResourcesFileMapped</key>' >>$plistfile
-echo '  <true/>' >>$plistfile
-echo '</dict>' >>$plistfile
-echo '</plist>' >>$plistfile
+cat >$plistfile <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>English</string>
+  <key>CFBundleExecutable</key>
+  <string>$appname</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleSignature</key>
+  <string>????</string>
+  <key>CFBundleVersion</key>
+  <string>1.0</string>
+  <key>CSResourcesFileMapped</key>
+  <true/>
+  <key>CFBundleIconFile</key>
+  <string>${iconfile_basename}</string>
+</dict>
+</plist>
+EOF
 
 echo "Done."
