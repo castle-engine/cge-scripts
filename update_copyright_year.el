@@ -55,7 +55,7 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
   ;; append year to my copyrights
   (kam-simple-re-replace-buffer
     "Copyright \\([0-9][0-9][0-9][0-9]\\)\\([,-][-0-9,]+\\)? Michalis Kamburelis."
-    "Copyright \\1-2010 Michalis Kamburelis.")
+    "Copyright \\1-2011 Michalis Kamburelis.")
 
   ;; add dashes line to LGPL units
   (kam-simple-replace-buffer
