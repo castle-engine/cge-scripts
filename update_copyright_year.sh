@@ -1,8 +1,7 @@
 #!/bin/bash
 set -eu
 
-cd ../
-find view3dscene/ castle/ kambi_vrml_game_engine/ \
+find ../ \
   '(' -type d -name .svn -prune ')' -or \
   '(' -type d -name .git -prune ')' -or \
   '(' -type f \
