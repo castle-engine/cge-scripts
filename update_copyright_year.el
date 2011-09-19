@@ -56,27 +56,5 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
   (kam-simple-re-replace-buffer
     "Copyright \\([0-9][0-9][0-9][0-9]\\)\\([,-][-0-9,]+\\)? Michalis Kamburelis."
     "Copyright \\1-2011 Michalis Kamburelis.")
-
-  ;; rename to Castle Game Engine
-;;   (kam-simple-replace-buffer
-;; "  This file is part of \"Kambi VRML game engine\".
-
-;;   \"Kambi VRML game engine\" is free software; see the file COPYING.txt,
-;;   included in this distribution, for details about the copyright.
-
-;;   \"Kambi VRML game engine\" is distributed in the hope that it will be useful,
-;;   but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
-
-;; "  This file is part of \"Castle Game Engine\".
-
-;;   \"Castle Game Engine\" is free software; see the file COPYING.txt,
-;;   included in this distribution, for details about the copyright.
-
-;;   \"Castle Game Engine\" is distributed in the hope that it will be useful,
-;;   but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
-;; )
-
   (save-buffer)
 )
