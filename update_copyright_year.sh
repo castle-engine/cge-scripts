@@ -10,5 +10,5 @@ find ../ \
         -iname '*.txt' -or \
         -iname '*.lpr' -')' \
     -exec emacs --batch \
-    -l scripts/update_copyright_year.el '{}' \
+    -l update_copyright_year.el '{}' \
     -f kam-update-copyright-year ';' ')'
