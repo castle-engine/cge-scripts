@@ -25,7 +25,7 @@ iconfile_basename=`basename "$iconfile"`
 
 if ! [ -e $appfile ]; then
   echo "$appfile binary does not exist."
-  echo "Run something like  ./compile.sh or ./compile_unix.sh or make build-unix first"
+  echo "Run something like \"./compile.sh\" or \"make\" first"
   exit 1
 fi
 
