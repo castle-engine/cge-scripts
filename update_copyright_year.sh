@@ -8,7 +8,9 @@ find ../ \
     '(' -iname '*.pas' -or \
         -iname '*.inc' -or \
         -iname '*.txt' -or \
-        -iname '*.lpr' -')' \
+        -iname '*.lpr' -or \
+        -iname '*.el'  -or \
+        -iname '*.php' ')' \
     -exec emacs --batch \
     -l update_copyright_year.el '{}' \
     -f kam-update-copyright-year ';' ')'
