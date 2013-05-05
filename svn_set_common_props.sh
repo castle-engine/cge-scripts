@@ -16,3 +16,11 @@ DEBUG=''
 # find ../ -iname *.x3d -exec $DEBUG svn propset svn:mime-type model/x3d+xml '{}' ';'
 # find ../ -iname *.x3dv -exec $DEBUG svn propset svn:mime-type model/x3d+vrml '{}' ';'
 # find ../ -iname *.wrl -exec $DEBUG svn propset svn:mime-type model/vrml '{}' ';'
+
+# Unfortunately, using the proper model/* MIME types doesn't play nicely with
+# SVN, that will then consider these files binary (and not show diffs).
+# See http://subversion.apache.org/faq.html#binary-files
+
+find ../ -iname *.x3d -exec $DEBUG svn propset svn:mime-type text/plain '{}' ';'
+find ../ -iname *.x3dv -exec $DEBUG svn propset svn:mime-type text/plain '{}' ';'
+find ../ -iname *.wrl -exec $DEBUG svn propset svn:mime-type text/plain '{}' ';'
