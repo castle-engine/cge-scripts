@@ -10,10 +10,14 @@ set -eu
 # in CamelCase.
 #
 # $2 is the binary name, must be in current dir.
+# We will actually run it, with --version, to get the version number.
 #
 # $3 is the icons (icns) filename, relative to current dir.
 # http://icns.sourceforge.net/ and svg_to_icns.sh may be useful
 # to create such icon.
+#
+# Handled document types, encoded in XML. Just leave empty if you
+# don't handle any file format.
 
 appname="$1"
 appfolder=$appname.app
@@ -22,6 +26,8 @@ plistfile=$appfolder/Contents/Info.plist
 appfile="$2"
 iconfile="$3"
 iconfile_basename=`basename "$iconfile"`
+appversion="`./$appfile --version`"
+appDocumentTypes="$4"
 
 if ! [ -e $appfile ]; then
   echo "$appfile binary does not exist."
@@ -41,6 +47,7 @@ mkdir $appfolder/Contents/MacOS
 mkdir $appfolder/Contents/Resources
 
 cp $appfile $macosfolder/$appname
+strip $macosfolder/$appname
 
 # Copy the resource files to the correct place
 cp "$iconfile" $appfolder/Contents/Resources
@@ -58,18 +65,44 @@ cat >$plistfile <<EOF
   <string>English</string>
   <key>CFBundleExecutable</key>
   <string>$appname</string>
+  <key>CFBundleName</key>
+  <string>$appname</string>
+  <key>CFBundleIdentifier</key>
+  <string>net.sourceforge.castle-engine.$appname</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleSignature</key>
-  <string>????</string>
+  <string>view</string>
+  <key>CFBundleShortVersionString</key>
+  <string>$appversion</string>
   <key>CFBundleVersion</key>
-  <string>1.0</string>
+  <string>$appversion</string>
   <key>CSResourcesFileMapped</key>
   <true/>
   <key>CFBundleIconFile</key>
   <string>${iconfile_basename}</string>
+  <key>CFBundleDocumentTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeRole</key>
+      <string>Viewer</string>
+      <key>CFBundleTypeExtensions</key>
+      <array>
+        <string>*</string>
+      </array>
+      <key>CFBundleTypeOSTypes</key>
+      <array>
+        <string>fold</string>
+        <string>disk</string>
+        <string>****</string>
+      </array>
+    </dict>
+    $appDocumentTypes
+  </array>
+  <key>NSHighResolutionCapable</key>
+  <true/>
 </dict>
 </plist>
 EOF
