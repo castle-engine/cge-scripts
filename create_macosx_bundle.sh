@@ -16,7 +16,7 @@ set -eu
 # http://icns.sourceforge.net/ and svg_to_icns.sh may be useful
 # to create such icon.
 #
-# Handled document types, encoded in XML. Just leave empty if you
+# $4 are handled document types, encoded in XML. Just leave empty if you
 # don't handle any file format.
 
 appname="$1"
