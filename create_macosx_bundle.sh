@@ -1,15 +1,19 @@
 #!/bin/bash
 set -eu
 
-# Create a xxx.app directory being a Mac OS X "bundle" (magic directory
-# that behaves like a clickable application under Mac OS X).
+# Utilities for creating xxx.app directory being a Mac OS X "bundle"
+# (magic directory that behaves like a clickable application under Mac OS X).
+# Include ("source") this script to have some useful functions,
+# first of all the create_bundle function.
+
+# Create a Mac OS X bundle.
 # This is based on createbundle.sh script from Lazarus examples/trayicon/,
 # improved and generalized by Kambi.
 #
 # $1 is the nice application name and folder basename. This is traditionally
 # in CamelCase.
 #
-# $2 is the binary name, must be in current dir.
+# $2 is the binary name, must be relative to current dir.
 # We will actually run it, with --version, to get the version number.
 #
 # $3 is the icons (icns) filename, relative to current dir.
@@ -18,45 +22,46 @@ set -eu
 #
 # $4 are handled document types, encoded in XML. Just leave empty if you
 # don't handle any file format.
+create_bundle ()
+{
+  local appname="$1"
+  local appfolder=$appname.app
+  local macosfolder=$appfolder/Contents/MacOS
+  local plistfile=$appfolder/Contents/Info.plist
+  local appfile="$2"
+  local iconfile="$3"
+  local iconfile_basename=`basename "$iconfile"`
+  local appversion="`./$appfile --version`"
+  local appDocumentTypes="$4"
 
-appname="$1"
-appfolder=$appname.app
-macosfolder=$appfolder/Contents/MacOS
-plistfile=$appfolder/Contents/Info.plist
-appfile="$2"
-iconfile="$3"
-iconfile_basename=`basename "$iconfile"`
-appversion="`./$appfile --version`"
-appDocumentTypes="$4"
+  if ! [ -e $appfile ]; then
+    echo "$appfile binary does not exist."
+    echo "Run something like \"./compile.sh\" or \"make\" first"
+    exit 1
+  fi
 
-if ! [ -e $appfile ]; then
-  echo "$appfile binary does not exist."
-  echo "Run something like \"./compile.sh\" or \"make\" first"
-  exit 1
-fi
+  if [ -e $appfolder ]; then
+    echo "$appfolder already exists, removing"
+    rm -Rf $appfolder
+  fi
 
-if [ -e $appfolder ]; then
-  echo "$appfolder already exists, removing"
-  rm -Rf $appfolder
-fi
+  echo "Creating $appfolder..."
+  mkdir $appfolder
+  mkdir $appfolder/Contents
+  mkdir $appfolder/Contents/MacOS
+  mkdir $appfolder/Contents/Resources
 
-echo "Creating $appfolder..."
-mkdir $appfolder
-mkdir $appfolder/Contents
-mkdir $appfolder/Contents/MacOS
-mkdir $appfolder/Contents/Resources
+  cp $appfile $macosfolder/$appname
+  strip $macosfolder/$appname
 
-cp $appfile $macosfolder/$appname
-strip $macosfolder/$appname
+  # Copy the resource files to the correct place
+  cp "$iconfile" $appfolder/Contents/Resources
 
-# Copy the resource files to the correct place
-cp "$iconfile" $appfolder/Contents/Resources
+  # Create PkgInfo file.
+  echo "APPL????" >$appfolder/Contents/PkgInfo
 
-# Create PkgInfo file.
-echo "APPL????" >$appfolder/Contents/PkgInfo
-
-# Create information property list file (Info.plist).
-cat >$plistfile <<EOF
+  # Create information property list file (Info.plist).
+  cat >$plistfile <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -107,4 +112,14 @@ cat >$plistfile <<EOF
 </plist>
 EOF
 
-echo "Done."
+  echo "Done."
+}
+
+# Copy fink lib $1, and adjust it's -id (how the library identifies itself,
+# may be important if another lib depends on it -- although tests show it's not really
+# important?).
+cp_fink_lib ()
+{
+  cp /sw/lib/"$1" .
+  install_name_tool -id @executable_path/"$1" "$1"
+}
