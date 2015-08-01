@@ -53,16 +53,12 @@ cd demo_models/shadow_maps/sunny_street/
 if [ "$LAZARUS" = 'lazarus' ]; then lazbuild sunny_street_process.lpi; else ./sunny_street_process_compile.sh; fi
 cd ../../../
 
-cd gen_function/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild gen_function.lpi; else ./compile.sh; fi
-cd ..
-
 cd glinformation/
 if [ "$LAZARUS" = 'lazarus' ]; then lazbuild glinformation_glut.lpi; lazbuild glinformation.lpi; else ./compile.sh; fi
 cd ..
 
 cd glplotter/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild glplotter.lpi; else ./compile.sh; fi
+if [ "$LAZARUS" = 'lazarus' ]; then lazbuild glplotter.lpi; lazbuild gen_function.lpi; else ./compile.sh; fi
 cd ..
 
 cd glviewimage/
