@@ -70,7 +70,7 @@ if [ "$LAZARUS" = 'lazarus' ]; then lazbuild code/hotel_nuclear.lpi; else make; 
 cd ..
 
 cd kambi_lines/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild kambi_lines.lpi; else ./compile.sh; fi
+if [ "$LAZARUS" = 'lazarus' ]; then lazbuild kambi_lines.lpi; else make; fi
 cd ..
 
 cd little_things/
@@ -78,7 +78,7 @@ if [ "$LAZARUS" = 'lazarus' ]; then lazbuild code/little_things.lpi; else make; 
 cd ..
 
 cd malfunction/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild malfunction.lpi; else ./compile.sh; fi
+if [ "$LAZARUS" = 'lazarus' ]; then lazbuild malfunction.lpi; else make; fi
 cd ..
 
 cd mountains_of_fire/
@@ -86,7 +86,7 @@ if [ "$LAZARUS" = 'lazarus' ]; then lazbuild code/mountains_of_fire.lpi; else ma
 cd ..
 
 cd rayhunter/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild rayhunter.lpi; else ./compile.sh; fi
+if [ "$LAZARUS" = 'lazarus' ]; then lazbuild rayhunter.lpi; else make; fi
 cd ..
 
 cd view3dscene/
