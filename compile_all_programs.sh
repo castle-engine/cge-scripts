@@ -38,7 +38,7 @@ if [ "$LAZARUS" = 'lazarus' ]; then
 fi
 
 cd bezier_curves/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild bezier_curves.lpi; else ./compile.sh; fi
+if [ "$LAZARUS" = 'lazarus' ]; then lazbuild bezier_curves.lpi; else make; fi
 cd ..
 
 cd castle/
