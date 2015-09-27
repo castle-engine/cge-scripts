@@ -90,5 +90,5 @@ if [ "$LAZARUS" = 'lazarus' ]; then lazbuild rayhunter.lpi; else make; fi
 cd ..
 
 cd view3dscene/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild view3dscene.lpi; lazbuild tovrmlx3d.lpi; else ./compile.sh; fi
+if [ "$LAZARUS" = 'lazarus' ]; then lazbuild view3dscene.lpi; lazbuild tovrmlx3d.lpi; else make; fi
 cd ..
