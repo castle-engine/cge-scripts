@@ -23,10 +23,7 @@ LAZARUS="${1:-}"
 
 echo "Castle Game Engine path detected: ${CASTLE_ENGINE_PATH}"
 cd "${CASTLE_ENGINE_PATH}"
-# On Cygwin, convert pwd output to something understandable for Windows programs.
-if which cygpath > /dev/null; then
-  CASTLE_ENGINE_PATH="`cygpath --mixed \"$CASTLE_ENGINE_PATH\"`"
-fi
+if [ '!' -d castle_game_engine ]; then cd ..; fi
 
 set -x
 

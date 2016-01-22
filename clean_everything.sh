@@ -16,6 +16,7 @@ set -eu
 
 echo "Castle Game Engine path detected: ${CASTLE_ENGINE_PATH}"
 cd "${CASTLE_ENGINE_PATH}"
+if [ '!' -d castle_game_engine ]; then cd ..; fi
 
 # programs
 make clean -C bezier_curves/
