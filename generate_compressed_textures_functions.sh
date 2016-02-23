@@ -74,6 +74,9 @@ do_atitc ()
 
   SUBDIR='compressed/atitc_rgba_interpolated/'
 
+  # Note: don't generate with -mipmaps, as
+  # - not always you need them, so it would be a waste of size.
+  # - using mipmaps with compressed textures is broken on some ATI GPUs on Android (testcase: escape on p phone).
   process_files \
     -execdir mkdir -p "${SUBDIR}" ';' \
     -execdir "${CONVERT}" '{}' -flip 'temporary.png' ';' \
