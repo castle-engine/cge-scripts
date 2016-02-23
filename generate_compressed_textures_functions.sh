@@ -1,6 +1,10 @@
 # Define bash functions to clean/generate textures in GPU-compressed formats
 # suitable for Android GPUs.
 #
+# They use
+# - PVRTexToolCLI (get it from https://community.imgtec.com/developers/powervr/tools/pvrtextool/ )
+# - AMD Compressonator (get it from http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/the-compressonator/ )
+#
 # ----------------------------------------------------------------------------
 # Usage:
 # Create your own shell script, where you:
