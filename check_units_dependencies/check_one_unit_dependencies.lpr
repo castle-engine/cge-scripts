@@ -33,7 +33,6 @@ uses Classes, SysUtils,
       IndirectDependencyCheck('3d', 'services') or
       IndirectDependencyCheck('castlescript', '3d') or
       IndirectDependencyCheck('x3d', 'castlescript') or
-      ( (CurrentCategory = 'x3d' ) and (DependencyCategory = 'game') ) or
       IndirectDependencyCheck('game', 'x3d') or
       IndirectDependencyCheck('window', 'game') or
       IndirectDependencyCheck('components', 'game');
