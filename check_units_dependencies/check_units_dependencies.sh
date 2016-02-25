@@ -13,15 +13,34 @@ set -eu
 CHECK_DIR=`pwd`
 castle-engine simple-compile check_one_unit_dependencies.lpr
 
+# Enter correct engine src dir.
+# Work with $CASTLE_ENGINE_PATH either pointing to top-level CGE SVN dir,
+# or to the actual CGE engine dir.
 if [ -d "${CASTLE_ENGINE_PATH}"/castle_game_engine/src/ ]; then
   cd "${CASTLE_ENGINE_PATH}"/castle_game_engine/src/
 else
   cd "${CASTLE_ENGINE_PATH}"/src/
 fi
 
-dircleaner . clean
+# Clean ppu/o files.
+# Work regardless if dircleaner is installed.
+if which dircleaner > /dev/null; then
+  dircleaner . clean
+else
+  find . -type f '(' -iname '*.ow'  -or -iname '*.ppw' -or \
+                     -iname '*.o'   -or -iname '*.ppu' ')' \
+    -print \
+    | xargs rm -f
+fi
 
-TMP_PAS_LIST="$HOME/tmp/test-cge-units-dependencies_all_units.txt"
+# Calculate temp file location.
+# Work regardless if $HOME/tmp is created.
+if [ -d "$HOME/tmp" ]; then
+  TMP_PAS_LIST="$HOME/tmp/test-cge-units-dependencies_all_units.txt"
+else
+  TMP_PAS_LIST="/tmp/test-cge-units-dependencies_all_units.txt"
+fi
+
 echo "All units list in ${TMP_PAS_LIST}"
 find . \
   '(' -type d -iname android -prune ')' -or \
@@ -33,7 +52,8 @@ for F in `cat "${TMP_PAS_LIST}"`; do
   echo "----------------------------------------------------------------------"
   echo "Checking dependencies of $F"
   castle-engine simple-compile "$F"
-  PPU="`stringoper ChangeFileExt \"$F\" .ppu`"
+  # Like `stringoper ChangeFileExt %F .ppu`
+  PPU="${F%.*}.ppu"
   DEPENDENCIES_TO_CHECK=`ppudump "$PPU" | grep 'Uses unit' | awk '{ print $3 }' | sort -u`
   # echo 'Got dependencies:'
   # echo "$DEPENDENCIES_TO_CHECK"
