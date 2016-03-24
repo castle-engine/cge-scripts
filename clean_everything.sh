@@ -19,7 +19,6 @@ cd "${CASTLE_ENGINE_PATH}"
 if [ '!' -d castle_game_engine ]; then cd ..; fi
 
 # programs
-make clean -C bezier_curves/
 make clean -C castle/
 make cleanmore -C castle_game_engine/
 make clean -C glinformation/

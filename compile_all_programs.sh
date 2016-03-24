@@ -34,10 +34,6 @@ if [ "$LAZARUS" = 'lazarus' ]; then
   lazbuild castle_game_engine/packages/castle_components.lpk
 fi
 
-cd bezier_curves/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild bezier_curves.lpi; else make; fi
-cd ..
-
 cd castle/
 if [ "$LAZARUS" = 'lazarus' ]; then lazbuild source/castle.lpi; else make; fi
 cd ..
