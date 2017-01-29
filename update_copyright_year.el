@@ -1,4 +1,4 @@
-;; Copyright 2006-2016 Michalis Kamburelis.
+;; Copyright 2006-2017 Michalis Kamburelis.
 ;;
 ;; This file is part of "Castle Game Engine".
 ;;
@@ -55,6 +55,6 @@ Uses regexps. FIXEDCASE has the same meaning as in `replace-match'."
   ;; append year to our copyrights
   (kam-simple-re-replace-buffer
     "Copyright \\([0-9][0-9][0-9][0-9]\\)\\([,-][-0-9,]+\\)?"
-    "Copyright \\1-2016")
+    "Copyright \\1-2017")
   (save-buffer)
 )
