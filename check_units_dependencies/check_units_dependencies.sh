@@ -54,6 +54,13 @@ for F in `cat "${TMP_PAS_LIST}"`; do
   castle-engine simple-compile "$F"
   # Like `stringoper ChangeFileExt %F .ppu`
   PPU="${F%.*}.ppu"
+
+  # Strip directory name,
+  # and add castle-engine-output/compilation/<arch-cpu>/,
+  # because that's where "castle-engine simple-compile" places ppu now.
+  PPU="`basename \"${PPU}\"`"
+  PPU='castle-engine-output/compilation/'`fpc -iTP`-`fpc -iTO`"/${PPU}"
+
   DEPENDENCIES_TO_CHECK=`ppudump "$PPU" | grep 'Uses unit' | awk '{ print $3 }' | sort -u`
   # echo 'Got dependencies:'
   # echo "$DEPENDENCIES_TO_CHECK"
