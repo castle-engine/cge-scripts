@@ -43,5 +43,6 @@ get_repo_custom_name little-things little_things
 get_repo             malfunction
 get_repo_custom_name mountains-of-fire mountains_of_fire
 get_repo             rayhunter
+get_repo_custom_name cge-scripts scripts
 get_repo             view3dscene
 get_repo_custom_name cge-www www
