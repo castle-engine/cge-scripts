@@ -33,15 +33,6 @@ make clean -C little_things/
 make clean -C mountains_of_fire/
 make clean -C hotel_nuclear/
 
-# papers
-make clean distclean -C documentation/vrml_engine_internals/
-make clean -C documentation/shadow_maps_x3d/
-make clean -C documentation/shadow_maps_x3d/slides/
-make clean -C documentation/compositing_shaders/
-make clean -C documentation/compositing_shaders_doc/
-make clean -C documentation/compositing_shaders/slides/
-make clean -C documentation/compositing_shaders/slides_pl_seminarium_doktoranckie/
-
 # models
 make clean -C demo_models/shadow_maps/sunny_street/
 
