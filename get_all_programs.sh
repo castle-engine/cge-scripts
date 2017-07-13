@@ -17,6 +17,9 @@ get_repo_custom_name ()
   if [ -d "$DIR" ]; then
     echo 'Updating '"$DIR"
     cd "$DIR"
+    # revert any changes, to avoid changing automatic-windows-resources
+    # from preventing the following "git pull"
+    git checkout .
     git pull --rebase
     cd ../
   else
