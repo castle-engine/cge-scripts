@@ -3,8 +3,13 @@
 uses Classes, SysUtils,
   CastleParameters, CastleStringUtils;
 
+  { Is it OK to depend from unit in CurrentCategory on a unit in DependencyCategory. }
   function DependencyOk(CurrentCategory, DependencyCategory: string): boolean;
 
+    { Enable depending of a unit from ValidCategory on a unit
+      in ValidDependencyCategory.
+      Works recursively, so any unit in a category that can depend on
+      ValidCategory can also depend on ValidDependencyCategory. }
     function IndirectDependencyCheck(const ValidCategory, ValidDependencyCategory: string): boolean;
     begin
       Result :=
@@ -22,6 +27,7 @@ uses Classes, SysUtils,
       ( (CurrentCategory = 'net' ) and (DependencyCategory = 'base') ) or
       // TODO: not nice dependency, it would be good to get rid of this:
       ( (CurrentCategory = 'net' ) and (DependencyCategory = 'images') ) or
+      IndirectDependencyCheck('base', 'compatibility') or
       IndirectDependencyCheck('audio', 'net') or
       IndirectDependencyCheck('audio', 'base') or
       IndirectDependencyCheck('images', 'net') or
@@ -80,7 +86,10 @@ begin
         DependencyDescribe := CurrentCategory + ' uses ' + DependencyCategory + ' (unit ' + CurrentUnit + ' uses ' + DependencyToCheck + ')';
         // Writeln('Checking: ', DependencyDescribe);
         if not DependencyOk(CurrentCategory, DependencyCategory) then
-          Writeln('NOT ALLOWED DEPENDENCY: ', DependencyDescribe);
+        begin
+          Writeln(ErrOutput, 'NOT ALLOWED DEPENDENCY: ', DependencyDescribe);
+          ExitCode := 1;
+        end;
       end;
     end;
   finally
