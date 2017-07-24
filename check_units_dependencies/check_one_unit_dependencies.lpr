@@ -23,11 +23,6 @@ uses Classes, SysUtils,
 
     Result :=
       (CurrentCategory = DependencyCategory) or
-
-      // TODO: files->images is not a nice dependency,
-      // it would be good to get rid of this:
-      ( (CurrentCategory = 'files' ) and (DependencyCategory = 'images') ) or
-
       IndirectDependencyCheck('base', 'compatibility') or
       IndirectDependencyCheck('files', 'base') or
       IndirectDependencyCheck('audio', 'files') or
