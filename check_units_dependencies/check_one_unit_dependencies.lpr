@@ -23,15 +23,15 @@ uses Classes, SysUtils,
 
     Result :=
       (CurrentCategory = DependencyCategory) or
-      ( (CurrentCategory = 'base') and (DependencyCategory = 'net') ) or
-      ( (CurrentCategory = 'net' ) and (DependencyCategory = 'base') ) or
-      // TODO: not nice dependency, it would be good to get rid of this:
-      ( (CurrentCategory = 'net' ) and (DependencyCategory = 'images') ) or
+
+      // TODO: files->images is not a nice dependency,
+      // it would be good to get rid of this:
+      ( (CurrentCategory = 'files' ) and (DependencyCategory = 'images') ) or
+
       IndirectDependencyCheck('base', 'compatibility') or
-      IndirectDependencyCheck('audio', 'net') or
-      IndirectDependencyCheck('audio', 'base') or
-      IndirectDependencyCheck('images', 'net') or
-      IndirectDependencyCheck('images', 'base') or
+      IndirectDependencyCheck('files', 'base') or
+      IndirectDependencyCheck('audio', 'files') or
+      IndirectDependencyCheck('images', 'files') or
       IndirectDependencyCheck('fonts', 'images') or
       IndirectDependencyCheck('ui', 'audio') or
       IndirectDependencyCheck('ui', 'fonts') or
@@ -65,7 +65,6 @@ var
       // All units in categories below are automatically tied to OpenGL,
       // they don't have to be in opengl/ subdirectory.
       SameText(Category, 'game') or
-      SameText(Category, 'services') or
       SameText(Category, 'window') or
       SameText(Category, 'component');
   end;
