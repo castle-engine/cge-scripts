@@ -47,11 +47,13 @@ rm -f "${TMP_LOG}"
 echo "Logging compilation output to ${TMP_LOG}"
 
 echo "All units list in ${TMP_PAS_LIST}"
+# Avoid compatibility category, to avoid https://bugs.freepascal.org/view.php?id=32192
 find . \
   '(' -type d -iname android -prune ')' -or \
   '(' -type d -iname windows -prune ')' -or \
   '(' -type d -iname components -prune ')' -or \
   '(' -type d -iname nodes_specification -prune ')' -or \
+  '(' -type d -iname compatibility -prune ')' -or \
   '(' -type f -iname '*.pas' -print ')' > "${TMP_PAS_LIST}"
 
 SUCCESS='true'
