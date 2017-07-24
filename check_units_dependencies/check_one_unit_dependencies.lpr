@@ -48,26 +48,45 @@ var
   AllCgeUnits: TStringList;
   DependenciesToCheck: TStringList;
 
-  function ExtractCategory(UnitPath: string): string;
+  procedure ExtractCategory(UnitPath: string;
+    out Category: string; out IsOpenGL: boolean);
+  var
+    TokenPos: Integer;
+    PartAfterCategory: string;
   begin
     while SCharIs(UnitPath, 1, '.') or
           SCharIs(UnitPath, 1, '/') do
       UnitPath := SEnding(UnitPath, 2); // cut off initial ./ from UnitPath
-    Result := NextTokenOnce(UnitPath, 1, ['/', '\']);
+    TokenPos := 1;
+    Category := NextToken(UnitPath, TokenPos, ['/', '\']);
+    PartAfterCategory := NextToken(UnitPath, TokenPos, ['/', '\']);
+    IsOpenGL :=
+      SameText(PartAfterCategory, 'opengl') or
+      // All units in categories below are automatically tied to OpenGL,
+      // they don't have to be in opengl/ subdirectory.
+      SameText(Category, 'game') or
+      SameText(Category, 'services') or
+      SameText(Category, 'window') or
+      SameText(Category, 'component');
   end;
 
-  function FindCategory(const DependencyBaseName: string): string;
+  function FindCategory(const DependencyBaseName: string;
+    out Category: string; out IsOpenGL: boolean): boolean;
   var
     UnitPath: string;
   begin
     for UnitPath in AllCgeUnits do
       if SameText(ChangeFileExt(ExtractFileName(UnitPath), ''), DependencyBaseName) then
-        Exit(ExtractCategory(UnitPath));
-    Exit('');
+      begin
+        ExtractCategory(UnitPath, Category, IsOpenGL);
+	Exit(true);
+      end;
+    Result := false;
   end;
 
 var
   CurrentUnit, DependencyToCheck, CurrentCategory, DependencyCategory, DependencyDescribe: string;
+  CurrentIsOpenGL, DependencyIsOpenGL: boolean;
 begin
   Parameters.CheckHigh(3);
   AllCgeUnits := TStringList.Create;
@@ -79,15 +98,25 @@ begin
   try
     for DependencyToCheck in DependenciesToCheck do
     begin
-      DependencyCategory := FindCategory(DependencyToCheck);
-      if DependencyCategory <> '' then
+      if FindCategory(DependencyToCheck, DependencyCategory, DependencyIsOpenGL) then
       begin
-        CurrentCategory := ExtractCategory(CurrentUnit);
-        DependencyDescribe := CurrentCategory + ' uses ' + DependencyCategory + ' (unit ' + CurrentUnit + ' uses ' + DependencyToCheck + ')';
+        ExtractCategory(CurrentUnit, CurrentCategory, CurrentIsOpenGL);
+        DependencyDescribe := Format('Category %s (OpenGL subdirectory: %s) uses %s (OpenGL subdirectory: %s). Unit %s uses %s',
+	  [CurrentCategory,
+	   BoolToStr(CurrentIsOpenGL, true),
+	   DependencyCategory,
+	   BoolToStr(DependencyIsOpenGL, true),
+	   CurrentUnit,
+	   DependencyToCheck]);
         // Writeln('Checking: ', DependencyDescribe);
         if not DependencyOk(CurrentCategory, DependencyCategory) then
         begin
-          Writeln(ErrOutput, 'NOT ALLOWED DEPENDENCY: ', DependencyDescribe);
+          Writeln(ErrOutput, 'ERROR: Not allowed dependency: ', DependencyDescribe);
+          ExitCode := 1;
+        end;
+	if (not CurrentIsOpenGL) and DependencyIsOpenGL then
+	begin
+          Writeln(ErrOutput, 'ERROR: Not allowed dependency (supposedly non-OpenGL code depends on OpenGL code): ', DependencyDescribe);
           ExitCode := 1;
         end;
       end;
