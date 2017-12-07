@@ -42,8 +42,8 @@ cd darkest_before_dawn/
 if [ "$LAZARUS" = 'lazarus' ]; then lazbuild code/darkest_before_dawn_standalone.lpi; else make; fi
 cd ..
 
-cd demo_models/shadow_maps/sunny_street/
-if [ "$LAZARUS" = 'lazarus' ]; then lazbuild sunny_street_process.lpi; else ./sunny_street_process_compile.sh; fi
+cd demo_models/shadow_maps/castle_with_trees/
+if [ "$LAZARUS" = 'lazarus' ]; then lazbuild castle_with_trees_process.lpi; else ./castle_with_trees_process_compile.sh; fi
 cd ../../../
 
 cd glinformation/

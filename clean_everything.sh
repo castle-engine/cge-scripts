@@ -34,6 +34,6 @@ make clean -C mountains_of_fire/
 make clean -C hotel_nuclear/
 
 # models
-make clean -C demo_models/shadow_maps/sunny_street/
+make clean -C demo_models/shadow_maps/castle_with_trees/
 
 dircleaner . clean
