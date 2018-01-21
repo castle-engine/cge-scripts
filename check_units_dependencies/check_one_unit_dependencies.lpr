@@ -23,6 +23,7 @@ uses Classes, SysUtils,
 
     Result :=
       (CurrentCategory = DependencyCategory) or
+      IndirectDependencyCheck('base', 'physics') or
       IndirectDependencyCheck('base', 'compatibility') or
       IndirectDependencyCheck('files', 'base') or
       IndirectDependencyCheck('audio', 'files') or
