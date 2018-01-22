@@ -194,3 +194,10 @@ temporary_change_lpi_to_alternative_castle_window_based_on_lcl ()
 
   echo "Changed $LPI to use alternative_castle_window_based_on_lcl: OK"
 }
+
+finish_macosx_pack ()
+{
+  rm -Rf *.app/ template.dmg wc.dmg
+  # Note: do not delete template.dmg.bz2, as it was possibly prepared specifically for this app
+  echo 'EVERYTHING DONE OK. Release the dmg file created by this script.'
+}
