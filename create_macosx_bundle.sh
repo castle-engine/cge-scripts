@@ -34,6 +34,8 @@ create_bundle ()
   local appversion="`./$appfile --version`"
   local appDocumentTypes="$4"
 
+  echo '--------------------- Creating app bundle  --------------------'
+
   if ! [ -e $appfile ]; then
     echo "$appfile binary does not exist."
     echo "Run something like \"./compile.sh\" or \"make\" first"
@@ -115,6 +117,11 @@ EOF
   echo "Done."
 }
 
+create_dmg ()
+{
+  make -f ../../cge-scripts/macosx_dmg.makefile NAME="$1"
+}
+
 # Copy fink lib $1, and adjust it's -id (how the library identifies itself,
 # may be important if another lib depends on it -- although tests show it's not really
 # important?).
@@ -133,4 +140,57 @@ check_libs_not_depending_on_fink ()
     echo 'Error: Some references to /sw/lib/ remain inside the bundle, application possibly will not run without fink installed. Check install_name_tool commands in create_macosx_bundle.sh script.'
     exit 1
   fi
+}
+
+# Run sed "in place", changing "$1". All other params are passed to sed verbatim.
+sed_in_place ()
+{
+  FILE_NAME="$1"
+  shift 1
+
+  local TEMP=/tmp/create_macosx_bundle-sed_in_place-$$.txt
+  sed "$@" "$FILE_NAME" > "$TEMP"
+  mv -f "$TEMP" "$FILE_NAME"
+}
+
+revert_change_lpi_to_alternative_castle_window_based_on_lcl ()
+{
+  sed_in_place "$CREATE_MACOSX_BUNDLE_LPI" -e 's|<PackageName Value="alternative_castle_window_based_on_lcl"/>|<PackageName Value="castle_window"/>|'
+
+  if grep 'alternative_castle_window_based_on_lcl' "$CREATE_MACOSX_BUNDLE_LPI" > /dev/null; then
+    echo "Can still find alternative_castle_window_based_on_lcl in $CREATE_MACOSX_BUNDLE_LPI, not good - revert_change_lpi_to_alternative_castle_window_based_on_lcl failed"
+    exit 1
+  fi
+
+  if ! grep '<PackageName Value="castle_window"/>' "$CREATE_MACOSX_BUNDLE_LPI" > /dev/null; then
+    echo "Cannot find castle_window in $CREATE_MACOSX_BUNDLE_LPI, not good - revert_change_lpi_to_alternative_castle_window_based_on_lcl failed"
+    exit 1
+  fi
+
+  echo "Reverted $CREATE_MACOSX_BUNDLE_LPI to use alternative_castle_window_based_on_lcl: OK"
+}
+
+# Change lpi ($1) to use alternative_castle_window_based_on_lcl, not castle_window.
+# Sets up "bash trap" http://redsymbol.net/articles/bash-exit-traps/
+# to revert this at script exit.
+temporary_change_lpi_to_alternative_castle_window_based_on_lcl ()
+{
+  local LPI="$1"
+
+  CREATE_MACOSX_BUNDLE_LPI="$LPI"
+  trap revert_change_lpi_to_alternative_castle_window_based_on_lcl EXIT
+
+  sed_in_place "$LPI" -e 's|<PackageName Value="castle_window"/>|<PackageName Value="alternative_castle_window_based_on_lcl"/>|'
+
+  if grep '"castle_window"' "$LPI" > /dev/null; then
+    echo "Can still find \"castle_window\" in $LPI, not good - temporary_change_lpi_to_alternative_castle_window_based_on_lcl failed"
+    exit 1
+  fi
+
+  if ! grep '<PackageName Value="alternative_castle_window_based_on_lcl"/>' "$LPI" > /dev/null; then
+    echo "Cannot find alternative_castle_window_based_on_lcl in $LPI, not good - temporary_change_lpi_to_alternative_castle_window_based_on_lcl failed"
+    exit 1
+  fi
+
+  echo "Changed $LPI to use alternative_castle_window_based_on_lcl: OK"
 }
