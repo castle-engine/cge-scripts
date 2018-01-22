@@ -127,6 +127,8 @@ cp_fink_lib ()
 # Check are all libs (and additional executables given as $@) do not depend on fink.
 check_libs_not_depending_on_fink ()
 {
+  echo 'Checking that libraries do not depend on fink (/sw/lib) existence.'
+  echo 'Message below that nothing matches *.dylib is OK, not a problem.'
   if otool -L *.dylib "$@" | grep /sw/lib/; then
     echo 'Error: Some references to /sw/lib/ remain inside the bundle, application possibly will not run without fink installed. Check install_name_tool commands in create_macosx_bundle.sh script.'
     exit 1
