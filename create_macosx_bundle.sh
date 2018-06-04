@@ -6,19 +6,87 @@ set -eu
 # Include ("source") this script to have some useful functions,
 # first of all the create_bundle function.
 
+# ----------------------------------------------------------------------------
+
+# Internal in this script.
+# Helper function for convert_to_icns.
+convert_to_icns_one_size ()
+{
+  local INPUT_FILE_NAME="$1"
+  local SIZE="$2"
+  shift 2
+
+  local INPUT_EXTENSION=".${INPUT_FILE_NAME##*.}"
+  if [ "${INPUT_EXTENSION}" = '.svg' ]; then
+    inkscape \
+      --export-width="${SIZE}" \
+      --export-height="${SIZE}" \
+      "${INPUT_FILE_NAME}" \
+      --export-png=convert_to_icns-temp-"${SIZE}".png
+  else
+    convert "${INPUT_FILE_NAME}" -geometry "${SIZE}x${SIZE}!" \
+      convert_to_icns-temp-"${SIZE}".png
+  fi
+}
+
+# Internal in this script.
+# Convert svg, png or other image format (known to ImageMagick)
+# to Mac OS X icns (icons) format.
+#
+# We use inkscape to convert svg to various sizes,
+# or ImageMagick "convert" to resize to various sizes,
+# then we use png2icns (http://icns.sourceforge.net/)
+# to convert a set of png images to final icns.
+#
+# $1 is input image file name, $2 is output icns file name.
+convert_to_icns ()
+{
+  local INPUT_FILE_NAME="$1"
+  local OUTPUT_FILE_NAME="$2"
+  shift 2
+
+  convert_to_icns_one_size "${INPUT_FILE_NAME}" 16
+  convert_to_icns_one_size "${INPUT_FILE_NAME}" 32
+  convert_to_icns_one_size "${INPUT_FILE_NAME}" 48
+  convert_to_icns_one_size "${INPUT_FILE_NAME}" 128
+  convert_to_icns_one_size "${INPUT_FILE_NAME}" 256
+  convert_to_icns_one_size "${INPUT_FILE_NAME}" 512
+
+  png2icns "$OUTPUT_FILE_NAME" \
+    convert_to_icns-temp-16.png \
+    convert_to_icns-temp-32.png \
+    convert_to_icns-temp-48.png \
+    convert_to_icns-temp-128.png \
+    convert_to_icns-temp-256.png \
+    convert_to_icns-temp-512.png
+
+  rm -f \
+    convert_to_icns-temp-16.png \
+    convert_to_icns-temp-32.png \
+    convert_to_icns-temp-48.png \
+    convert_to_icns-temp-128.png \
+    convert_to_icns-temp-256.png \
+    convert_to_icns-temp-512.png
+}
+
 # Create a Mac OS X bundle.
 # This is based on createbundle.sh script from Lazarus examples/trayicon/,
 # improved and generalized by Kambi.
 #
-# $1 is the nice application name and folder basename. This is traditionally
-# in CamelCase.
+# $1 is the nice application name. Used as a folder basename.
+# This is traditionally in CamelCase.
+# This determines the look of the final bundle file,
+# and may be completely unrelated to the executable name,
+# or application name specified in CastleEngineManifest.xml .
 #
-# $2 is the binary name, must be relative to current dir.
-# We will actually run it, with --version, to get the version number.
+# $2 is the binary (executable) filename, relative to the current dir.
+# This file must actually exist, we will copy it into the bundle,
+# we will also run it (with --version) to get the version number.
 #
-# $3 is the icons (icns) filename, relative to current dir.
-# http://icns.sourceforge.net/ and svg_to_icns.sh may be useful
-# to create such icon.
+# $3 is the icon filename, relative to the current dir.
+# If it's not already in macOS .icns format,
+# it will be internally converted into it, using various tools
+# like png2icns, ImageMagick, inkscape (in case input is svg).
 #
 # $4 are handled document types, encoded in XML. Just leave empty if you
 # don't handle any file format.
@@ -29,10 +97,9 @@ create_bundle ()
   local macosfolder=$appfolder/Contents/MacOS
   local plistfile=$appfolder/Contents/Info.plist
   local appfile="$2"
-  local iconfile="$3"
-  local iconfile_basename=`basename "$iconfile"`
-  local appversion="`./$appfile --version`"
-  local appDocumentTypes="$4"
+  local ICON_FILE="$3"
+  local appversion="`./$appfile --version | cut -d" " -f2`"
+  local appDocumentTypes="${4:-}"
 
   echo '--------------------- Creating app bundle  --------------------'
 
@@ -56,8 +123,17 @@ create_bundle ()
   cp $appfile $macosfolder/$appname
   strip $macosfolder/$appname
 
-  # Copy the resource files to the correct place
-  cp "$iconfile" $appfolder/Contents/Resources
+  # Make sure $ICON_FILE is in .icns format,
+  # and place the icon file in the correct place
+  local ICON_EXTENSION=".${ICON_FILE##*.}"
+  if [ "${ICON_EXTENSION}" != '.icns' ]; then
+    local NEW_ICON_FILE="${appname}.icns"
+    echo "Converting the icon to ICNS format in ${NEW_ICON_FILE}..."
+    convert_to_icns "${ICON_FILE}" "${NEW_ICON_FILE}"
+    mv "$NEW_ICON_FILE" $appfolder/Contents/Resources/"${appname}.icns"
+  else
+    cp "$ICON_FILE" $appfolder/Contents/Resources/"${appname}.icns"
+  fi
 
   # Create PkgInfo file.
   echo "APPL????" >$appfolder/Contents/PkgInfo
@@ -89,7 +165,7 @@ create_bundle ()
   <key>CSResourcesFileMapped</key>
   <true/>
   <key>CFBundleIconFile</key>
-  <string>${iconfile_basename}</string>
+  <string>${appname}</string>
   <key>CFBundleDocumentTypes</key>
   <array>
     <dict>
@@ -117,9 +193,22 @@ EOF
   echo "Done."
 }
 
+# Create the dmg file.
+#
+# $1 and $2 are the same as for create_bundle:
+# $1 is the nice application name and folder basename. This is traditionally
+# in CamelCase.
+# $2 is the binary name, must be relative to current dir.
+# We will actually run it, with --version, to get the version number.
 create_dmg ()
 {
-  make -f ../../cge-scripts/macosx_dmg.makefile NAME="$1"
+  local appname="$1"
+  local appfolder=$appname.app
+  local appfile="$2"
+  local appversion="`./$appfile --version | cut -d" " -f2`"
+
+  make -f "${CGE_SCRIPTS_PATH:-../../../castle-engine/cge-scripts/}"macosx_dmg.makefile \
+    NAME="${appname}" VERSION="${appversion}"
 }
 
 # Copy fink lib $1, and adjust it's -id (how the library identifies itself,

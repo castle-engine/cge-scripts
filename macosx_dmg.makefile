@@ -26,6 +26,8 @@ SOURCE_FILES ?= $(NAME).app
 
 TEMPLATE_DMG ?= template.dmg
 
+# Max size of data inside archive
+SIZE ?= 2g
 
 ################################################################################
 # DMG building. No editing should be needed beyond this point.
@@ -52,7 +54,7 @@ $(TEMPLATE_DMG).bz2:
 	@echo
 	@echo --------------------- Generating empty template --------------------
 	mkdir template
-	hdiutil create -fs HFSX -layout SPUD -size 40m "$(TEMPLATE_DMG)" -srcfolder template -format UDRW -volname "$(NAME)"
+	hdiutil create -fs HFSX -layout SPUD -size $(SIZE) "$(TEMPLATE_DMG)" -srcfolder template -format UDRW -volname "$(NAME)"
 	rmdir template
 	bzip2 "$(TEMPLATE_DMG)"
 	@echo
