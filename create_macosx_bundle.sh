@@ -207,6 +207,8 @@ create_dmg ()
   local appfile="$2"
   local appversion="`./$appfile --version | cut -d" " -f2`"
 
+  echo "Creating dmg for application ${appname} version ${appversion}"
+
   make -f "${CGE_SCRIPTS_PATH:-../../../castle-engine/cge-scripts/}"macosx_dmg.makefile \
     NAME="${appname}" VERSION="${appversion}"
 }
