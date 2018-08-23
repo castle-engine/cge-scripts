@@ -205,7 +205,16 @@ create_dmg ()
   local appname="$1"
   local appfolder=$appname.app
   local appfile="$2"
-  local appversion="`./$appfile --version | cut -d" " -f2`"
+
+  # We remove lines
+  #   TCarbonClipboard.Create Error: PasteboardCreate primary selection failed with result -4960
+  #   TCarbonClipboard.Create Error: PasteboardCreate secondary selection failed with result -4960
+  #   TCarbonClipboard.Create Error: PasteboardCreate clipboard failed with result -4960
+  # generated on stdout when macOS application
+  # using TCastleWindow backend LCL widgetset Carbon is run
+  # under ssh (like Jenkins), not GUI.
+
+  local appversion="`./$appfile --version | grep --invert-match 'TCarbonClipboard.Create Error: PasteboardCreate' | cut -d" " -f2`"
 
   echo "Creating dmg for application ${appname} version ${appversion}"
 
