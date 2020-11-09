@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eu
 
-# Utilities for creating xxx.app directory being a Mac OS X "bundle"
-# (magic directory that behaves like a clickable application under Mac OS X).
+# Utilities for creating xxx.app directory, which is a macOS "bundle"
+# (magic directory that behaves like a clickable application under macOS).
 # Include ("source") this script to have some useful functions,
 # first of all the create_bundle function.
 
