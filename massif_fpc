@@ -3,6 +3,7 @@ set -eu
 
 valgrind --tool=massif --run-libc-freeres=no \
   --alloc-fn='CMEM_CGETMEM$LONGWORD$$POINTER' \
+  --alloc-fn='CMEM_$$_CGETMEM$QWORD$$POINTER' \
   --alloc-fn='CMEM_CGETMEM$LONGINT$$POINTER' \
   --alloc-fn='CMEM_CREALLOCMEM$POINTER$LONGWORD$$POINTER' \
   --alloc-fn='CMEM_CREALLOCMEM$POINTER$LONGINT$$POINTER' \
@@ -10,8 +11,11 @@ valgrind --tool=massif --run-libc-freeres=no \
   --alloc-fn='SYSTEM_GETMEM$LONGINT$$POINTER' \
   --alloc-fn='SYSTEM_GETMEM$POINTER$LONGWORD' \
   --alloc-fn='SYSTEM_GETMEM$POINTER$LONGINT' \
+  --alloc-fn='SYSTEM_$$_GETMEM$POINTER$QWORD' \
   --alloc-fn='SYSTEM_REALLOCMEM$POINTER$LONGWORD$$POINTER' \
   --alloc-fn='SYSTEM_REALLOCMEM$POINTER$LONGINT$$POINTER' \
+  --alloc-fn='SYSTEM$_$TOBJECT_$__$$_NEWINSTANCE$$TOBJECT' \
+  --threshold=0.01 \
   "$@"
 
 # --format=html was useful with previous massif versions, but it seems not available anymore?
