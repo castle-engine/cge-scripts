@@ -25,19 +25,21 @@ uses Classes, SysUtils,
       (CurrentCategory = DependencyCategory) or
       IndirectDependencyCheck('base', 'physics') or
       IndirectDependencyCheck('base', 'compatibility') or
+      IndirectDependencyCheck('base', 'deprecated_units') or // everything can use deprecated_units, ignore
       IndirectDependencyCheck('files', 'base') or
       IndirectDependencyCheck('audio', 'files') or
       IndirectDependencyCheck('images', 'files') or
+      IndirectDependencyCheck('images', 'vampyre_imaginglib') or
       IndirectDependencyCheck('fonts', 'images') or
       IndirectDependencyCheck('ui', 'audio') or
       IndirectDependencyCheck('ui', 'fonts') or
       IndirectDependencyCheck('services', 'ui') or
-      IndirectDependencyCheck('3d', 'services') or
-      IndirectDependencyCheck('castlescript', '3d') or
+      IndirectDependencyCheck('transform', 'services') or
+      IndirectDependencyCheck('castlescript', 'transform') or
+      IndirectDependencyCheck('x3d', 'pasgltf') or
       IndirectDependencyCheck('x3d', 'castlescript') or
-      IndirectDependencyCheck('game', 'x3d') or
-      IndirectDependencyCheck('window', 'game') or
-      IndirectDependencyCheck('components', 'game');
+      IndirectDependencyCheck('window', 'x3d') or
+      IndirectDependencyCheck('lcl', 'x3d');
   end;
 
 var
@@ -60,9 +62,8 @@ var
       SameText(PartAfterCategory, 'opengl') or
       // All units in categories below are automatically tied to OpenGL,
       // they don't have to be in opengl/ subdirectory.
-      SameText(Category, 'game') or
       SameText(Category, 'window') or
-      SameText(Category, 'component');
+      SameText(Category, 'lcl');
   end;
 
   function FindCategory(const DependencyBaseName: string;

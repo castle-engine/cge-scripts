@@ -15,22 +15,15 @@ CHECK_DIR=`pwd`
 # Enter correct engine src dir.
 # Work with $CASTLE_ENGINE_PATH either pointing to top-level CGE SVN dir,
 # or to the actual CGE engine dir.
-if [ -d "${CASTLE_ENGINE_PATH}"/castle_game_engine/src/ ]; then
-  cd "${CASTLE_ENGINE_PATH}"/castle_game_engine/src/
-else
-  cd "${CASTLE_ENGINE_PATH}"/src/
-fi
+cd "${CASTLE_ENGINE_PATH}"/src/
 
 # Clean ppu/o files.
-# Work regardless if dircleaner is installed.
-if which dircleaner > /dev/null; then
-  dircleaner . clean
-else
-  find . -type f '(' -iname '*.ow'  -or -iname '*.ppw' -or \
-                     -iname '*.o'   -or -iname '*.ppu' ')' \
-    -print \
-    | xargs rm -f
-fi
+make clean -C ../
+# Should not be needed, but just in case...
+find . -type f '(' -iname '*.ow'  -or -iname '*.ppw' -or \
+                   -iname '*.o'   -or -iname '*.ppu' ')' \
+  -print \
+  | xargs rm -f
 
 # Calculate temp file location.
 # Work regardless if $HOME/tmp is created.
@@ -47,13 +40,22 @@ rm -f "${TMP_LOG}"
 echo "Logging compilation output to ${TMP_LOG}"
 
 echo "All units list in ${TMP_PAS_LIST}"
-# Avoid compatibility category, to avoid https://bugs.freepascal.org/view.php?id=32192
+# Avoid
+# - compatibility, to avoid https://bugs.freepascal.org/view.php?id=32192
+# - vampyre_imaginglib:
+#   To avoid considering DOM, XMLRead etc. (Vampyre has their copies) inside CGE.
+#   Also, some units inside may not compile without LCL.
+# - lcl, indy as they depend on LCL, Indy and compilation with just `castle-engine simple-compile ...` may fail
+# - deprecated_units, we don't track their dependencies
 find . \
   '(' -type d -iname android -prune ')' -or \
   '(' -type d -iname windows -prune ')' -or \
-  '(' -type d -iname components -prune ')' -or \
+  '(' -type d -iname lcl -prune ')' -or \
+  '(' -type d -iname indy -prune ')' -or \
   '(' -type d -iname nodes_specification -prune ')' -or \
   '(' -type d -iname compatibility -prune ')' -or \
+  '(' -type d -iname deprecated_units -prune ')' -or \
+  '(' -type d -iname vampyre_imaginglib -prune ')' -or \
   '(' -type f -iname '*.pas' -print ')' > "${TMP_PAS_LIST}"
 
 SUCCESS='true'
