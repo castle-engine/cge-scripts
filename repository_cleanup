@@ -21,7 +21,7 @@ IFS=$'\n\t'
 #
 #     stage('Cleanup') {
 #      steps {
-#        sh "repository_cleanup --remove-unversioned ."
+#        sh "repository_cleanup . --remove-unversioned"
 #      }
 #    }
 #
