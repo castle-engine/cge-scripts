@@ -1,0 +1,79 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+# Bash strict mode: http://redsymbol.net/articles/unofficial-bash-strict-mode/
+
+# -------------------------------------------------------------------------------------------------
+#
+# Revert the current directory to the state "right after checkout".
+# - Removes all files not under version control (unversioned, ignored and not ignored)
+#   if --remove-unversioned is used.
+# - Reverts the rest of files to correspond exactly to the version control state
+#
+# This is paricularly useful to run at the beginning of Jenkins pipeline jobs,
+# that do not have a trivial way right now to say "always start from a clean state,
+# corresponding to clean version control clone".
+#
+# ( There exists https://plugins.jenkins.io/ws-cleanup/ , but it removes whole workspace,
+#   which will mean you have to redownload everything. )
+#
+# For example you can add this step as a 1st step of Jenkinsfile:
+#
+#     stage('Cleanup') {
+#      steps {
+#        sh "repository_cleanup --remove-unversioned ."
+#      }
+#    }
+#
+# CGE Docker images have this script available.
+# See https://castle-engine.io/docker , https://castle-engine.io/cloud_builds_jenkins .
+#
+# -------------------------------------------------------------------------------------------------
+
+DIRECTORY="$1"
+shift 1
+
+if [ "${1:-}" = '--remove-unversioned' ]; then
+  REMOVE_UNVERSIONED='true'
+  shift 1
+else
+  REMOVE_UNVERSIONED=''
+fi
+
+# Note that we don't detect SVN/GIT using Jenkins env variables like SVN_REVISION,
+# this way it also works for non-Jenkins projects.
+if svn info > /dev/null 2>&1; then
+  echo "repository_cleanup: Reverting SVN working copy in: ${DIRECTORY}"
+  svn revert -R "${DIRECTORY}"
+
+  if [ -n "${REMOVE_UNVERSIONED}" ]; then
+    echo 'repository_cleanup: Cleaning unversioned files.'
+    svn cleanup --remove-unversioned --remove-ignored "${DIRECTORY}"
+    echo 'repository_cleanup: Checking status is empty now.'
+    STATUS="`svn stat --no-ignore \"${DIRECTORY}\"`"
+  else
+    echo 'repository_cleanup: Checking status is empty now.'
+    set +e # ignore grep exit status
+    STATUS="`svn stat \"${DIRECTORY}\" | grep --invert-match ^?`"
+    set -e
+  fi
+else
+  echo "repository_cleanup: Reverting GIT working copy in: ${DIRECTORY}"
+  git checkout "${DIRECTORY}"
+
+  if [ -n "${REMOVE_UNVERSIONED}" ]; then
+    echo 'repository_cleanup: Cleaning unversioned files.'
+    git clean -d --force -x "${DIRECTORY}"
+    echo 'repository_cleanup: Checking status is empty now.'
+    STATUS="`git status --short --untracked-files=normal \"${DIRECTORY}\"`"
+  else
+    echo 'repository_cleanup: Checking status is empty now.'
+    STATUS="`git status --short --untracked-files=no \"${DIRECTORY}\"`"
+  fi
+fi
+
+if [ -n "${STATUS}" ]; then
+  echo 'repository_cleanup: Non-empty status, failed (not cleaned the repo as requested).'
+  echo "${STATUS}"
+  exit 1
+fi
