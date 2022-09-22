@@ -1,61 +1,88 @@
 #!/bin/bash
 set -eu
 
+# ----------------------------------------------------------------------------
 # Get from version control FPC, Lazarus and build + install them system-wide.
+#
+# In a way, this is a "simple version of fpcup / fpcupdeluxe".
+# This strives to be a simplest command-line script that gets FPC and Lazarus
+# from version control and installs.
+#
+# Note: This assumes that FPC version suitable for "boostrapping" the indicated
+# version (in FPC_BRANCHTAG) is already installed and on $PATH.
+# E.g. you can do "apt install fpc" if your OS ships with proper FPC version
+# (equal or one before FPC_BRANCHTAG).
+# There is no need for Lazarus for bootstrapping.
 
-# see https://svn.freepascal.org/cgi-bin/viewvc.cgi/tags/release_3_2_0_rc1/
-# https://www.freepascal.org/develop.html
+# ----------------------------------------------------------------------------
+# Configure these variables freely
 
-FPC_BRANCHTAG='tags/release_3_2_2/'
-LAZARUS_BRANCHTAG='tags/lazarus_2_0_12/'
-FPC_DIR_NAME='3.2.2'
-LAZARUS_DIR_NAME='2.0.12'
+# See https://gitlab.com/freepascal.org/fpc/source/-/tags for posibilities
+FPC_BRANCHTAG='release_3_2_2'
+# See https://gitlab.com/freepascal.org/lazarus/lazarus/-/tags for posibilities
+LAZARUS_BRANCHTAG='lazarus_2_2_2'
+
+# Must match FPC version in install directory.
+# Also used to name src/install subdirectories of FPC.
+FPC_VERSION='3.2.2'
+# Used to name src/install subdirectories of Lazarus.
+LAZARUS_VERSION='2.2.2'
+
+# FPC and Lazarus sources and installed files will be under this.
+BASE_DIR="$HOME/fpc_lazarus/"
+
+# ppc binary suffix corresponding to current system architecture. Like arm, x64, x86.
+PPC_SUFFIX='x64'
+#PPC_SUFFIX='arm'
+
+FPC_INSTALL="$BASE_DIR/installed/fpc/$FPC_VERSION"
+LAZARUS_INSTALL="$BASE_DIR/installed/lazarus/$LAZARUS_VERSION"
+FPC_SRC_PARENT="$BASE_DIR/src/fpc"
+LAZARUS_SRC_PARENT="$BASE_DIR/src/lazarus"
+FPC_SRC="$FPC_SRC_PARENT/$FPC_VERSION"
+LAZARUS_SRC="$LAZARUS_SRC_PARENT/$LAZARUS_VERSION"
+
+# ----------------------------------------------------------------------------
+# End of configurable section.
+
+export PATH="${FPC_INSTALL}/bin:${LAZARUS_INSTALL}:${PATH}"
+
+do_cleanup ()
+{
+  rm -Rf "$FPC_INSTALL" "$LAZARUS_INSTALL"
+}
 
 do_get_fpc_lazarus ()
 {
-  rm -Rf ~/sources/fpc/ ~/sources/lazarus/
-  mkdir ~/sources/fpc/ ~/sources/lazarus/
+  rm -Rf "$FPC_SRC" "$LAZARUS_SRC"
+  mkdir -p "$FPC_SRC_PARENT" "$LAZARUS_SRC_PARENT"
 
-  cd ~/sources/fpc/
-  svn co https://svn.freepascal.org/svn/fpc/"${FPC_BRANCHTAG}" "${FPC_DIR_NAME}"
+  cd "$FPC_SRC_PARENT"
+  git clone https://gitlab.com/freepascal.org/fpc/source.git --depth 1 \
+    --single-branch --branch "${FPC_BRANCHTAG}" "${FPC_VERSION}"
 
-  cd ~/sources/lazarus/
-  svn co https://svn.freepascal.org/svn/lazarus/"${LAZARUS_BRANCHTAG}" "${LAZARUS_DIR_NAME}"
+  cd "$LAZARUS_SRC_PARENT"
+  git clone https://gitlab.com/freepascal.org/lazarus/lazarus.git --depth 1 \
+    --single-branch --branch "${LAZARUS_BRANCHTAG}" "${LAZARUS_VERSION}"
 }
 
 do_install_fpc ()
 {
-  cd ~/sources/fpc/"${FPC_DIR_NAME}"/
+  cd "$FPC_SRC"
 
-  # ONCE: get fpc from packages to bootstrap
-  # sudo apt install fpc
+  mkdir -p "${FPC_INSTALL}"
+  make clean all install INSTALL_PREFIX="${FPC_INSTALL}"
+  cd "${FPC_INSTALL}"/bin
+  ln -s ../lib/fpc/"${FPC_VERSION}"/ppc"$PPC_SUFFIX" .
 
-  export FPC_INSTALL_DIR="${HOME}"/installed/fpc
-  mkdir -p "${FPC_INSTALL_DIR}"
-  make clean all install INSTALL_PREFIX="${FPC_INSTALL_DIR}"
-  cd ~/installed/fpc/bin && ln -s ../lib/fpc/"${FPC_DIR_NAME}"/ppcarm .
+  # make symlinks, useful e.g. by /etc/fpc.cfg or ~/.fpc.cfg, and FPCDIR in /home/jenkins/.bashrc
+  rm -f "${FPC_INSTALL}"/lib/fpc/current/
+  ln -s "${FPC_VERSION}" "${FPC_INSTALL}"/lib/fpc/current
+}
 
-  # ONCE: fix after "apt install fpc"
-  # purge FPC from packages, but leave some useful dev libraries like GTK
-  # sudo apt purge fpc
-  # sudo apt install libgtk2.0-dev libglu1-mesa-dev
-  # sudo apt --purge autoremove
-
-  # ONCE: make the new FPC on $PATH, in ~/.profile
-
-  # make system-wide ------------------------------------------
-
-  sudo rm -Rf /usr/local/fpc
-  sudo mv "${HOME}"/installed/fpc /usr/local
-  sudo chown -R root:root /usr/local/fpc
-  
-  # make symlinks, used e.g. by /etc/fpc.cfg, and FPCDIR in /home/jenkins/.bashrc
-  rm -f /usr/local/fpc/lib/fpc/current/
-  ln -s "${FPC_DIR_NAME}" /usr/local/fpc/lib/fpc/current
-
-  # test ----------------------------------------
-
-  cd ~/sources/
+do_test_fpc ()
+{
+  cd /tmp/
   # test new fpc
   echo 'begin writeln(2+2) end.' > a.pas
   fpc -l
@@ -65,69 +92,32 @@ do_install_fpc ()
 
 do_install_lazarus ()
 {
-  cd ~/sources/lazarus/"${LAZARUS_DIR_NAME}"/
-  export LAZ_INSTALL_DIR="${HOME}"/installed/lazarus
-  mkdir -p "${LAZ_INSTALL_DIR}"
-  make clean all install INSTALL_PREFIX="${LAZ_INSTALL_DIR}"
-
-  # ONCE: make lazarus lazbuild on $PATH in ~/.profle
-
-  # make system-wide -------------------------------------------------
-
-  sudo rm -Rf /usr/local/lazarus
-  sudo mv "${HOME}"/installed/lazarus /usr/local
-  sudo mv "${HOME}"/sources/lazarus/"${LAZARUS_DIR_NAME}" /usr/local/lazarus/src
+  cd "$LAZARUS_SRC"
+  mkdir -p "${LAZARUS_INSTALL}"
+  make clean all install INSTALL_PREFIX="${LAZARUS_INSTALL}"
 
   # fix lazbuild to work, by passing --lazarusdir
-  sudo mv /usr/local/lazarus/bin/lazbuild  /usr/local/lazarus/bin/lazbuild-real
-  sudo bash -c 'cat > /usr/local/lazarus/bin/lazbuild <<EOF
+  mv "${LAZARUS_INSTALL}lazbuild" "${LAZARUS_INSTALL}lazbuild-real"
+  cat > "${LAZARUS_INSTALL}lazbuild" <<EOF
 #!/bin/bash
 set -eu
 
 # DO NOT EDIT - this file is auto-generated and may be overridden.
-# Created by CGE FPC/Lazarus compilation script for Raspberry Pi.
+# Created by CGE FPC/Lazarus compilation script.
 
-/usr/local/lazarus/bin/lazbuild-real --lazarusdir=/usr/local/lazarus/src "\$@"
-EOF'
-  sudo chmod +x /usr/local/lazarus/bin/lazbuild
+${LAZARUS_INSTALL}lazbuild-real --lazarusdir=${LAZARUS_SRC} "\$@"
+EOF
+  chmod +x "${LAZARUS_INSTALL}lazbuild"
+}
 
-  sudo chown -R root:root /usr/local/lazarus
-
-  # test ---------------------------------------------------
-
+do_test_lazarus ()
+{
   lazbuild --version
 }
 
-do_cge ()
-{
-  cd ~/sources/castle-engine/
-  git clone https://github.com/castle-engine/castle-engine/
-
-  cd ~/sources/castle-engine/castle-engine/
-  # make tools
-  mkdir -p "${HOME}"/installed/castle-engine
-  make install PREFIX="${HOME}"/installed/castle-engine
-  export CASTLE_ENGINE_PATH="${HOME}/sources/castle-engine/castle-engine/"
-  export PATH="${PATH}:${HOME}/installed/castle-engine/bin"
-  make examples
-  make examples-laz
-  make tests
-  make test-fpmake
-  ./tools/internal/pack_release/pack_release.sh linux arm
-}
-
-# As we're extra short on disk space, remove unnecessary leftovers from ~/sources and ~/installed
-do_clean ()
-{
-  rm -Rf \
-    "${HOME}"/sources/fpc/"${FPC_DIR_NAME}" \
-    "${HOME}"/sources/lazarus/"${LAZARUS_DIR_NAME}" \
-    "${HOME}"/installed/fpc \
-    "${HOME}"/installed/lazarus
-}
-
+do_cleanup
 do_get_fpc_lazarus
 do_install_fpc
+do_test_fpc
 do_install_lazarus
-#do_cge # just a test - no longer useful, Jenkins does CGE on this host now
-do_clean
+do_test_lazarus
