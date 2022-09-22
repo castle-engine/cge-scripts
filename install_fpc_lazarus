@@ -4,7 +4,7 @@ set -eu
 # ----------------------------------------------------------------------------
 # Get from version control FPC, Lazarus and build + install them system-wide.
 #
-# In a way, this is a "simple version of fpcup / fpcupdeluxe".
+# In a way, this is a "simplest version of fpcup / fpcupdeluxe".
 # This strives to be a simplest command-line script that gets FPC and Lazarus
 # from version control and installs.
 #
@@ -13,6 +13,16 @@ set -eu
 # E.g. you can do "apt install fpc" if your OS ships with proper FPC version
 # (equal or one before FPC_BRANCHTAG).
 # There is no need for Lazarus for bootstrapping.
+#
+# Author: Michalis Kamburelis
+# License: permissive "modified BSD (3-clause)", https://github.com/castle-engine/castle-engine/blob/master/doc/licenses/COPYING.BSD-3-clause.txt
+#
+# To use the installed FPC and Lazarus, it's simplest to
+# 1. Add them on $PATH.
+# 2. Always call FPC using "fpc.sh",
+#    or include the ${FPC_INSTALL}/fpc.cfg to ~/.fpc.cfg.
+#    This is important when calling FPC from Lazarus (IDE or lazbuild) too,
+#    they also must call "fpc.sh" or you have to extend ~/.fpc.cfg .
 
 # ----------------------------------------------------------------------------
 # Configure these variables freely
@@ -28,15 +38,25 @@ FPC_VERSION='3.2.2'
 # Used to name src/install subdirectories of Lazarus.
 LAZARUS_VERSION='2.2.2'
 
-# FPC and Lazarus sources and installed files will be under this.
-BASE_DIR="$HOME/fpc_lazarus/"
-
 # ppc binary suffix corresponding to current system architecture. Like arm, x64, x86.
 PPC_SUFFIX='x64'
 #PPC_SUFFIX='arm'
 
-FPC_INSTALL="$BASE_DIR/installed/fpc/$FPC_VERSION"
-LAZARUS_INSTALL="$BASE_DIR/installed/lazarus/$LAZARUS_VERSION"
+# current architecture and OS, used by FPC to name the units subdirectory.
+FPC_ARCH='x86_64'
+FPC_OS='linux'
+
+# FPC and Lazarus sources and installed files will be under this.
+# Our current scheme is to
+# - create subdirectory like fpcXXX-lazarusYYY
+#   (since these FPC/Lazarus versions should be used together, as this FPC was used for this Lazarus)
+# - underneath there will be bin/ lib/ and other subdirs created by FPC and Lazarus "make install"
+#   We put them both under the same subdir.
+#   This also gives one simple ${BASE_DIR}/bin.
+# - sources are in src/ .
+BASE_DIR="$HOME/installed/fpc_lazarus/fpc${FPC_VERSION}-lazarus${LAZARUS_VERSION}"
+FPC_INSTALL="$BASE_DIR"
+LAZARUS_INSTALL="$BASE_DIR"
 FPC_SRC_PARENT="$BASE_DIR/src/fpc"
 LAZARUS_SRC_PARENT="$BASE_DIR/src/lazarus"
 FPC_SRC="$FPC_SRC_PARENT/$FPC_VERSION"
@@ -45,16 +65,15 @@ LAZARUS_SRC="$LAZARUS_SRC_PARENT/$LAZARUS_VERSION"
 # ----------------------------------------------------------------------------
 # End of configurable section.
 
-export PATH="${FPC_INSTALL}/bin:${LAZARUS_INSTALL}:${PATH}"
+export PATH="${BASE_DIR}/bin:${PATH}"
 
 do_cleanup ()
 {
-  rm -Rf "$FPC_INSTALL" "$LAZARUS_INSTALL"
+  rm -Rf "${BASE_DIR}"
 }
 
 do_get_fpc_lazarus ()
 {
-  rm -Rf "$FPC_SRC" "$LAZARUS_SRC"
   mkdir -p "$FPC_SRC_PARENT" "$LAZARUS_SRC_PARENT"
 
   cd "$FPC_SRC_PARENT"
@@ -75,44 +94,78 @@ do_install_fpc ()
   cd "${FPC_INSTALL}"/bin
   ln -s ../lib/fpc/"${FPC_VERSION}"/ppc"$PPC_SUFFIX" .
 
-  # make symlinks, useful e.g. by /etc/fpc.cfg or ~/.fpc.cfg, and FPCDIR in /home/jenkins/.bashrc
+  # make "current" symlink, useful e.g. by fpc.cfg, and $FPCDIR if you want it
   rm -f "${FPC_INSTALL}"/lib/fpc/current/
   ln -s "${FPC_VERSION}" "${FPC_INSTALL}"/lib/fpc/current
+
+  cat > "${FPC_INSTALL}/fpc.cfg" <<EOF
+-Fu${FPC_INSTALL}/lib/fpc/current/units/${FPC_ARCH}-${FPC_OS}/*
+EOF
+
+  cat > "${FPC_INSTALL}/bin/fpc.sh" <<EOF
+#!/bin/bash
+set -eu
+${FPC_INSTALL}/bin/fpc -n @${FPC_INSTALL}/fpc.cfg "\$@"
+EOF
+
+  chmod +x "${FPC_INSTALL}/bin/fpc.sh"
 }
 
 do_test_fpc ()
 {
   cd /tmp/
-  # test new fpc
-  echo 'begin writeln(2+2) end.' > a.pas
-  fpc -l
-  fpc a.pas
-  ./a
+  echo 'Testing FPC on /tmp/install_fpc_lazarus_test.pas'
+  # Test new fpc - compile something (using some units, to make sure they are set up)
+  echo 'uses SysUtils; begin Writeln(2+2) end.' > install_fpc_lazarus_test.pas
+  "${FPC_INSTALL}/bin/fpc.sh" -l install_fpc_lazarus_test.pas
+  ./install_fpc_lazarus_test
 }
 
 do_install_lazarus ()
 {
   cd "$LAZARUS_SRC"
   mkdir -p "${LAZARUS_INSTALL}"
-  make clean all install INSTALL_PREFIX="${LAZARUS_INSTALL}"
+  make clean all install INSTALL_PREFIX="${LAZARUS_INSTALL}" PP="${FPC_INSTALL}/bin/fpc.sh"
 
   # fix lazbuild to work, by passing --lazarusdir
-  mv "${LAZARUS_INSTALL}lazbuild" "${LAZARUS_INSTALL}lazbuild-real"
-  cat > "${LAZARUS_INSTALL}lazbuild" <<EOF
+  mv "${LAZARUS_INSTALL}/bin/lazbuild" "${LAZARUS_INSTALL}/bin/lazbuild-real"
+  cat > "${LAZARUS_INSTALL}/bin/lazbuild" <<EOF
 #!/bin/bash
 set -eu
 
 # DO NOT EDIT - this file is auto-generated and may be overridden.
 # Created by CGE FPC/Lazarus compilation script.
 
-${LAZARUS_INSTALL}lazbuild-real --lazarusdir=${LAZARUS_SRC} "\$@"
+${LAZARUS_INSTALL}/bin/lazbuild-real --lazarusdir=${LAZARUS_SRC} "\$@"
 EOF
-  chmod +x "${LAZARUS_INSTALL}lazbuild"
+  chmod +x "${LAZARUS_INSTALL}/bin/lazbuild"
 }
 
 do_test_lazarus ()
 {
   lazbuild --version
+}
+
+do_done ()
+{
+  echo "----------------------------------------------------------------------"
+  echo "Done."
+  echo "Installed FPC in ${FPC_INSTALL}"
+  fpc -iV
+  echo "Installed Lazarus in ${LAZARUS_INSTALL}"
+  lazbuild --version
+  echo "To use them:"
+  echo
+  echo "1. You *may* add them to \$PATH (unless you will always run by providing full path), like this:"
+  cat <<EOF
+   export PATH="${BASE_DIR}/bin:\${PATH}"
+EOF
+  echo
+  echo '2. Always call FPC using \"fpc.sh\".'
+  echo '   Or extend your FPC configuration, by adding this to ~/.fpc.cfg:'
+  cat <<EOF
+   #INCLUDE ${FPC_INSTALL}/fpc.cfg
+EOF
 }
 
 do_cleanup
@@ -121,3 +174,4 @@ do_install_fpc
 do_test_fpc
 do_install_lazarus
 do_test_lazarus
+do_done
