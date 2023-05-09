@@ -55,6 +55,7 @@ sed -i 's/\bPchar\b/PChar/g' $1
 
 
 # add a space for some symbols
+sed -i 's/,\([a-zA-Z0-9]\)/, \1/g' $1
 sed -i 's/:\([a-zA-Z]\)/: \1/g' $1
 sed -i 's/:=\([a-zA-Z0-9]\)/:= \1/g' $1
 sed -i 's/\([a-zA-Z0-9]\):=/\1 :=/g' $1
