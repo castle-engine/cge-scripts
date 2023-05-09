@@ -52,6 +52,8 @@ sed -i 's/\bPbyte\b/PByte/g' $1
 sed -i 's/\bpchar\b/PChar/g' $1
 sed -i 's/\bPchar\b/PChar/g' $1
 
+
+
 # add a space for some symbols
 sed -i 's/:\([a-zA-Z]\)/: \1/g' $1
 sed -i 's/:=\([a-zA-Z0-9]\)/:= \1/g' $1
@@ -113,6 +115,8 @@ sed -i 's/)to\b/) to/g' $1
 sed -i 's/\bdownto(/downto (/g' $1
 sed -i 's/)downto\b/) downto/g' $1
 
+
+
 # some other common keywords that need to be capitalized
 sed -i 's/\bexit\b/Exit/g' $1
 sed -i 's/\bresult\b/Result/g' $1
@@ -127,6 +131,8 @@ sed -i 's/\bdec\b/Dec/g' $1
 sed -i 's/\brandom\b/Random/g' $1
 sed -i 's/\bmaxint\b/MaxInt/g' $1
 sed -i 's/\bMaxint\b/MaxInt/g' $1
+sed -i 's/\bdestroy\b/Destroy/g' $1
+sed -i 's/\bcreate\b/Create/g' $1
 
 sed -i 's/\bi\b/I/g' $1
 sed -i 's/\bj\b/J/g' $1
@@ -136,6 +142,8 @@ sed -i 's/\bs\b/S/g' $1 # WARNING: unfortunately messes with text like it's but 
 sed -i 's/\bb\b/B/g' $1
 sed -i 's/\bc\b/C/g' $1
 sed -i 's/\bp\b/P/g' $1
+sed -i 's/\bw\b/W/g' $1
+sed -i 's/\bh\b/H/g' $1
 sed -i 's/\blen\b/Len/g' $1
 sed -i 's/\bargs\b/Args/g' $1
 sed -i 's/\bindex\b/Index/g' $1
@@ -149,6 +157,7 @@ sed -i 's/\bwritelnwarning\b/WritelnWarning/g' $1
 sed -i 's/\bWritelnwarning\b/WritelnWarning/g' $1
 sed -i 's/\bWritelnWarning\b/WritelnWarning/g' $1
 sed -i 's/\bWritelnLogMultiline\b/WriteLnLogMultiline/g' $1
+
 
 
 # things that maybe rare, but still might be useful + as names are unique enough, should not cause any harm
@@ -170,10 +179,34 @@ sed -i 's/\bformposstart\b/FormPosStart/g' $1
 sed -i 's/\bfilemask\b/FileMask/g' $1
 sed -i 's/\bcyfra\b/Number/g' $1
 sed -i 's/\bdigit\b/Digit/g' $1
+sed -i 's/\bbuf\b/Buf/g' $1
+sed -i 's/\bgzfile\b/GzFile/g' $1
+sed -i 's/\bcheck_header\b/CheckHeader/g' $1
+sed -i 's/\bstream\b/Stream/g' $1
+sed -i 's/\bstrategy\b/Strategy/g' $1
+sed -i 's/\blevel\b/Level/g' $1
+sed -i 's/\bn1\b/N1/g' $1
+sed -i 's/\bn2\b/N2/g' $1
+sed -i 's/\bget_byte\b/GetByte/g' $1
+sed -i 's/\bdeflateEnd\b/DeflateEnd/g' $1
+sed -i 's/\binflateEnd\b/InflateEnd/g' $1
+sed -i 's/\bwritten\b/Written/g' $1
+sed -i 's/\bputLong\b/PutLong/g' $1
+sed -i 's/\bkey\b/Key/g' $1
+sed -i 's/\bminWidth\b/MinWidth/g' $1
+sed -i 's/\bminHeight\b/MinHeight/g' $1
+sed -i 's/\bmaxWidth\b/MaxWidth/g' $1
+sed -i 's/\bmaxHeight\b/MaxHeight/g' $1
+sed -i 's/\bright\b/Right/g' $1
+sed -i 's/\bleft\b/Left/g' $1
+sed -i 's/\bbottom\b/Bottom/g' $1
+sed -i 's/\btop\b/Top/g' $1
 
 # some other common keywords that need to be decapitalized
 sed -i 's/\bTrue\b/true/g' $1
 sed -i 's/\bFalse\b/false/g' $1
+
+
 
 # insert linebreaks in common situations, keeping indentation
 # note ^\([[:blank:]]*\) means "all whitespace or tabs from the beginning of the line" - available in replacement as \1
