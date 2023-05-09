@@ -4,11 +4,14 @@
 # \([a-zA-Z0-9]\) means any symbol of the proposed - it'll be available in "replacement" as \1, \2, \3 etc
 sed -i 's/\bbyte\b/Byte/g' $1
 sed -i 's/\bshortint\b/ShortInt/g' $1
+sed -i 's/\bShortint\b/ShortInt/g' $1
 sed -i 's/\bsmallint\b/SmallInt/g' $1
+sed -i 's/\bSmallint\b/SmallInt/g' $1
 sed -i 's/\binteger\b/Integer/g' $1
 sed -i 's/\bword\b/Word/g' $1
 sed -i 's/\bcardinal\b/Cardinal/g' $1
 sed -i 's/\blongint\b/LongInt/g' $1
+sed -i 's/\bLongint\b/LongInt/g' $1
 sed -i 's/\blongword\b/LongWord/g' $1
 sed -i 's/\bLongword\b/LongWord/g' $1
 sed -i 's/\bqword\b/QWord/g' $1
