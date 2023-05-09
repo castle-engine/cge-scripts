@@ -1,3 +1,7 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
 # capitalize types
 # warning : will capitalize these words also in comments, some manual fixing may be required
 # note: \b means "word border" i.e. `\bbyte\b will find only full word "byte" (case-sensitive) and not bytesequence
