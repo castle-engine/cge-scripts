@@ -2,7 +2,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# capitalize types
+# capitalize types and some other smaller formatting fixes
+# usage `sh capitalize_types.sh unitname.pas`
 # warning : will capitalize these words also in comments, some manual fixing may be required
 # note: \b means "word border" i.e. `\bbyte\b will find only full word "byte" (case-sensitive) and not bytesequence
 # \([a-zA-Z0-9]\) means any symbol of the proposed - it'll be available in "replacement" as \1, \2, \3 etc
