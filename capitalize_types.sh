@@ -135,7 +135,7 @@ sed -i 's/\bpos\b/Pos/g' $1
 sed -i 's/\bfreeandnil\b/FreeAndNil/g' $1
 sed -i 's/\bFreeandnil\b/FreeAndNil/g' $1
 #sed -i 's/\binc\b/Inc/g' $1 ---- unfortunately messes up include files
-sed -i 's/\bin(c\b/Inc(/g' $1
+sed -i 's/\binc(\b/Inc(/g' $1
 sed -i 's/\bdec\b/Dec/g' $1
 sed -i 's/\brandom\b/Random/g' $1
 sed -i 's/\bmaxint\b/MaxInt/g' $1
