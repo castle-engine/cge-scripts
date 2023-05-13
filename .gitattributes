@@ -1,0 +1,7 @@
+# See https://github.com/github/linguist about the linguist attributes.
+#
+# See https://help.github.com/en/articles/dealing-with-line-endings
+# about line endings.
+
+# Even on Windows, shell scripts line endings must be Unix, to work with Cygwin's bash.
+*.sh text eol=lf
