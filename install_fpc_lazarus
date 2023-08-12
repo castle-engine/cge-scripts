@@ -159,14 +159,14 @@ do_done ()
   "${LAZARUS_INSTALL}/bin/lazbuild" --version
   echo "To use them:"
   echo
-  echo "1.1. You *may* add them to \$PATH (unless you will always run by providing full path), like this:"
+  echo "1. You *may* add them to \$PATH (unless you will always run by providing full path), like this:"
   cat <<EOF
    export PATH="${BASE_DIR}/bin:\${PATH}"
 EOF
   echo
-  echo '1.2. Always call FPC using \"fpc.sh\".'
-  echo
-  echo '2. Or extend your FPC configuration, by adding this to ~/.fpc.cfg:'
+  echo '2. Make sure that FPC always uses proper config:'
+  echo '2.1. Always call FPC using "fpc.sh".'
+  echo '2.2. Or extend your FPC configuration, by adding this to ~/.fpc.cfg:'
   cat <<EOF
    #INCLUDE ${FPC_INSTALL}/fpc.cfg
 EOF
