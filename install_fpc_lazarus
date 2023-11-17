@@ -36,16 +36,17 @@ LAZARUS_BRANCHTAG='lazarus_2_2_6'
 # Also used to name src/install subdirectories of FPC.
 FPC_VERSION='3.2.2'
 # Used to name src/install subdirectories of Lazarus.
-LAZARUS_VERSION='2.2.2'
+LAZARUS_VERSION='2.2.6'
 
 # ppc binary suffix corresponding to current system architecture. Like arm, x64, x86.
-PPC_SUFFIX='x64'
-#PPC_SUFFIX='arm'
+#PPC_SUFFIX='x64'
+PPC_SUFFIX='arm'
 
 # Current architecture and OS, used by FPC to name the units subdirectory.
 # Correspond to FPC OS and CPU names, can also be seen in "castle-engine --help"
 # as CGE uses the same OS and CPU names for consistency with FPC.
-FPC_ARCH='x86_64'
+FPC_ARCH='aarch64'
+#FPC_ARCH='x86_64'
 #FPC_ARCH='arm'
 FPC_OS='linux'
 
