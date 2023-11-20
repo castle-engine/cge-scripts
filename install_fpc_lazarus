@@ -27,9 +27,17 @@ set -eu
 # ----------------------------------------------------------------------------
 # Configure these variables freely
 
-# See https://gitlab.com/freepascal.org/fpc/source/-/tags for posibilities
+# FPC branch or tag.
+# See for possibilities:
+# https://gitlab.com/freepascal.org/fpc/source/-/tags
+# https://gitlab.com/freepascal.org/fpc/source/-/branches
 FPC_BRANCHTAG='release_3_2_2'
-# See https://gitlab.com/freepascal.org/lazarus/lazarus/-/tags for posibilities
+#FPC_BRANCHTAG='fixes_3_2'
+
+# Lazarus branch or tag.
+# See for posibilities:
+# https://gitlab.com/freepascal.org/lazarus/lazarus/-/tags
+# https://gitlab.com/freepascal.org/lazarus/lazarus/-/branches
 LAZARUS_BRANCHTAG='lazarus_2_2_6'
 
 # Must match FPC version in install directory.
@@ -38,16 +46,22 @@ FPC_VERSION='3.2.2'
 # Used to name src/install subdirectories of Lazarus.
 LAZARUS_VERSION='2.2.6'
 
-# ppc binary suffix corresponding to current system architecture. Like arm, x64, x86.
-#PPC_SUFFIX='x64'
-PPC_SUFFIX='arm'
+# ppc binary suffix corresponding to current system architecture.
+# FPC team invent 3-letter suffix for all architectures.
+# Examples below.
+PPC_SUFFIX='x64'
+# Arm (32-bit)
+#PPC_SUFFIX='arm'
+# Aarch64 (aka Arm 64-bit)
+#PPC_SUFFIX='a64'
 
 # Current architecture and OS, used by FPC to name the units subdirectory.
 # Correspond to FPC OS and CPU names, can also be seen in "castle-engine --help"
 # as CGE uses the same OS and CPU names for consistency with FPC.
-FPC_ARCH='aarch64'
-#FPC_ARCH='x86_64'
+FPC_ARCH='x86_64'
 #FPC_ARCH='arm'
+#FPC_ARCH='aarch64'
+
 FPC_OS='linux'
 
 # FPC and Lazarus sources and installed files will be under this.
