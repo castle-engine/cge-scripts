@@ -31,38 +31,45 @@ set -eu
 # See for possibilities:
 # https://gitlab.com/freepascal.org/fpc/source/-/tags
 # https://gitlab.com/freepascal.org/fpc/source/-/branches
-FPC_BRANCHTAG='release_3_2_2'
-#FPC_BRANCHTAG='fixes_3_2'
+#FPC_BRANCHTAG='release_3_2_2'
+FPC_BRANCHTAG='fixes_3_2'
 
 # Lazarus branch or tag.
 # See for posibilities:
 # https://gitlab.com/freepascal.org/lazarus/lazarus/-/tags
 # https://gitlab.com/freepascal.org/lazarus/lazarus/-/branches
-LAZARUS_BRANCHTAG='lazarus_2_2_6'
+#LAZARUS_BRANCHTAG='lazarus_2_2_6'
+LAZARUS_BRANCHTAG='main'
 
 # Must match FPC version in install directory.
 # Also used to name src/install subdirectories of FPC.
-FPC_VERSION='3.2.2'
+FPC_VERSION='3.2.3'
 # Used to name src/install subdirectories of Lazarus.
-LAZARUS_VERSION='2.2.6'
+LAZARUS_VERSION='3.0.0'
 
 # ppc binary suffix corresponding to current system architecture.
 # FPC team invent 3-letter suffix for all architectures.
 # Examples below.
-PPC_SUFFIX='x64'
+#PPC_SUFFIX='x64'
 # Arm (32-bit)
 #PPC_SUFFIX='arm'
 # Aarch64 (aka Arm 64-bit)
-#PPC_SUFFIX='a64'
+PPC_SUFFIX='a64'
 
 # Current architecture and OS, used by FPC to name the units subdirectory.
 # Correspond to FPC OS and CPU names, can also be seen in "castle-engine --help"
 # as CGE uses the same OS and CPU names for consistency with FPC.
-FPC_ARCH='x86_64'
+#FPC_ARCH='x86_64'
 #FPC_ARCH='arm'
-#FPC_ARCH='aarch64'
+FPC_ARCH='aarch64'
 
 FPC_OS='linux'
+
+# Building given FPC version requires having last stable
+# FPC version installed and on $PATH.
+# Or, uncomment and adjust line below to use specific version
+# for bootstrapping.
+BOOTSTRAP_FPC=FPC=$HOME/sources/castle-engine/cge-scripts/bootstrap-fpc/3.2.2/ppca64
 
 # FPC and Lazarus sources and installed files will be under this.
 # Our current scheme is to
@@ -108,7 +115,7 @@ do_install_fpc ()
   cd "$FPC_SRC"
 
   mkdir -p "${FPC_INSTALL}"
-  make clean all install INSTALL_PREFIX="${FPC_INSTALL}"
+  make clean all install INSTALL_PREFIX="${FPC_INSTALL}" ${BOOTSTRAP_FPC}
   cd "${FPC_INSTALL}"/bin
   ln -s ../lib/fpc/"${FPC_VERSION}"/ppc"$PPC_SUFFIX" .
 
