@@ -31,8 +31,8 @@ set -eu
 # See for possibilities:
 # https://gitlab.com/freepascal.org/fpc/source/-/tags
 # https://gitlab.com/freepascal.org/fpc/source/-/branches
-#FPC_BRANCHTAG='release_3_2_2'
-FPC_BRANCHTAG='fixes_3_2'
+FPC_BRANCHTAG='release_3_2_2'
+#FPC_BRANCHTAG='fixes_3_2'
 
 # Lazarus branch or tag.
 # See for posibilities:
@@ -43,7 +43,7 @@ LAZARUS_BRANCHTAG='lazarus_3_2'
 
 # Must match FPC version in install directory.
 # Also used to name src/install subdirectories of FPC.
-FPC_VERSION='3.2.3'
+FPC_VERSION='3.2.2'
 # Used to name src/install subdirectories of Lazarus.
 LAZARUS_VERSION='3.2'
 
