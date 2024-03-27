@@ -38,6 +38,7 @@ FPC_BRANCHTAG='release_3_2_2'
 # See for posibilities:
 # https://gitlab.com/freepascal.org/lazarus/lazarus/-/tags
 # https://gitlab.com/freepascal.org/lazarus/lazarus/-/branches
+#LAZARUS_BRANCHTAG='main' # use this for very latest commit
 LAZARUS_BRANCHTAG='lazarus_3_2'
 
 # Must match FPC version in install directory.
