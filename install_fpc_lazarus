@@ -12,6 +12,8 @@ set -eu
 # version (in FPC_BRANCHTAG) is already installed and on $PATH.
 # E.g. you can do "apt install fpc" if your OS ships with proper FPC version
 # (equal or one before FPC_BRANCHTAG).
+# Alternatively you can uncomment and adjust BOOTSTRAP_FPC below to use
+# some ready FPC versions for bootstrapping inside this repo.
 # There is no need for Lazarus for bootstrapping.
 #
 # Author: Michalis Kamburelis
@@ -69,7 +71,7 @@ FPC_OS='linux'
 # FPC version installed and on $PATH.
 # Or, uncomment and adjust line below to use specific version
 # for bootstrapping.
-BOOTSTRAP_FPC=FPC=$HOME/sources/castle-engine/cge-scripts/bootstrap-fpc/3.2.2/ppca64
+#BOOTSTRAP_FPC=FPC=`pwd`/bootstrap-fpc/3.2.2/ppca64
 
 # FPC and Lazarus sources and installed files will be under this.
 # Our current scheme is to
