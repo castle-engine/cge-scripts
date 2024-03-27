@@ -38,14 +38,14 @@ FPC_BRANCHTAG='fixes_3_2'
 # See for posibilities:
 # https://gitlab.com/freepascal.org/lazarus/lazarus/-/tags
 # https://gitlab.com/freepascal.org/lazarus/lazarus/-/branches
-#LAZARUS_BRANCHTAG='lazarus_2_2_6'
-LAZARUS_BRANCHTAG='main'
+#LAZARUS_BRANCHTAG='main' # use this for very latest commit
+LAZARUS_BRANCHTAG='lazarus_3_2'
 
 # Must match FPC version in install directory.
 # Also used to name src/install subdirectories of FPC.
 FPC_VERSION='3.2.3'
 # Used to name src/install subdirectories of Lazarus.
-LAZARUS_VERSION='3.0.0'
+LAZARUS_VERSION='3.2'
 
 # ppc binary suffix corresponding to current system architecture.
 # FPC team invent 3-letter suffix for all architectures.
