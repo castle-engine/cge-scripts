@@ -41,13 +41,13 @@ FPC_BRANCHTAG='release_3_2_2'
 # https://gitlab.com/freepascal.org/lazarus/lazarus/-/tags
 # https://gitlab.com/freepascal.org/lazarus/lazarus/-/branches
 #LAZARUS_BRANCHTAG='main' # use this for very latest commit
-LAZARUS_BRANCHTAG='lazarus_3_2'
+LAZARUS_BRANCHTAG='lazarus_3_8'
 
 # Must match FPC version in install directory.
 # Also used to name src/install subdirectories of FPC.
 FPC_VERSION='3.2.2'
 # Used to name src/install subdirectories of Lazarus.
-LAZARUS_VERSION='3.2'
+LAZARUS_VERSION='3.8'
 
 # ppc binary suffix corresponding to current system architecture.
 # FPC team invent 3-letter suffix for all architectures.
@@ -72,6 +72,7 @@ FPC_OS='linux'
 # Or, uncomment and adjust line below to use specific version
 # for bootstrapping.
 #BOOTSTRAP_FPC=FPC=`pwd`/bootstrap-fpc/3.2.2/ppca64
+BOOTSTRAP_FPC='FPC=fpc'
 
 # FPC and Lazarus sources and installed files will be under this.
 # Our current scheme is to
@@ -81,7 +82,7 @@ FPC_OS='linux'
 #   We put them both under the same subdir.
 #   This also gives one simple ${BASE_DIR}/bin.
 # - sources are in src/ .
-BASE_DIR="$HOME/installed/fpc_lazarus/fpc${FPC_VERSION}-lazarus${LAZARUS_VERSION}"
+BASE_DIR="$HOME/installed/fpclazarus/cge-scripts-fpc${FPC_VERSION}-lazarus${LAZARUS_VERSION}"
 FPC_INSTALL="$BASE_DIR"
 LAZARUS_INSTALL="$BASE_DIR"
 FPC_SRC_PARENT="$BASE_DIR/src/fpc"
