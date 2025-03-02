@@ -90,6 +90,13 @@ LAZARUS_SRC_PARENT="$BASE_DIR/src/lazarus"
 FPC_SRC="$FPC_SRC_PARENT/$FPC_VERSION"
 LAZARUS_SRC="$LAZARUS_SRC_PARENT/$LAZARUS_VERSION"
 
+# source install_fpc_lazarus.config, if exists, so that it can override
+# the parameters above.
+# Create it e.g. by "cp install_fpc_lazarus.config.linux_aarch64 install_fpc_lazarus.config"
+if [ -f install_fpc_lazarus.config ]; then
+  source install_fpc_lazarus.config
+fi
+
 # ----------------------------------------------------------------------------
 # End of configurable section.
 

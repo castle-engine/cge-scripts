@@ -1,0 +1,16 @@
+# Template for building from and to Linux/Aarch64,
+# like Raspberry Pi 64-bit or Pine64 products using Arm 64-bit.
+#
+# Use by
+# cp install_fpc_lazarus.config.linux_aarch64 install_fpc_lazarus.config
+
+# Need FPC 3.2.3 from fixes branch, 3.2.2 stable cannot link.
+FPC_BRANCHTAG='fixes_3_2'
+FPC_VERSION='3.2.3'
+
+PPC_SUFFIX='a64'
+FPC_ARCH='aarch64'
+FPC_OS='linux'
+
+# Rely on bootstrap distributed in this repo
+BOOTSTRAP_FPC=FPC=`pwd`/bootstrap-fpc/3.2.2/ppca64
