@@ -74,6 +74,17 @@ FPC_OS='linux'
 #BOOTSTRAP_FPC=FPC=`pwd`/bootstrap-fpc/3.2.2/ppca64
 BOOTSTRAP_FPC='FPC=fpc'
 
+# source install_fpc_lazarus.config, if exists, so that it can override
+# the parameters above.
+# Create it e.g. by "cp install_fpc_lazarus.config.linux_aarch64 install_fpc_lazarus.config"
+if [ -f install_fpc_lazarus.config ]; then
+  source install_fpc_lazarus.config
+fi
+
+# ----------------------------------------------------------------------------
+# Calculated variables. Cannot be adjusted by install_fpc_lazarus.config .
+# TODO: But we could allow it, just define these only if not defined already.
+
 # FPC and Lazarus sources and installed files will be under this.
 # Our current scheme is to
 # - create subdirectory like fpcXXX-lazarusYYY
@@ -89,13 +100,6 @@ FPC_SRC_PARENT="$BASE_DIR/src/fpc"
 LAZARUS_SRC_PARENT="$BASE_DIR/src/lazarus"
 FPC_SRC="$FPC_SRC_PARENT/$FPC_VERSION"
 LAZARUS_SRC="$LAZARUS_SRC_PARENT/$LAZARUS_VERSION"
-
-# source install_fpc_lazarus.config, if exists, so that it can override
-# the parameters above.
-# Create it e.g. by "cp install_fpc_lazarus.config.linux_aarch64 install_fpc_lazarus.config"
-if [ -f install_fpc_lazarus.config ]; then
-  source install_fpc_lazarus.config
-fi
 
 # ----------------------------------------------------------------------------
 # End of configurable section.
