@@ -1,0 +1,71 @@
+# -------------------------------------------------------------------------
+# Source this to build CGE build tool and expose env vars.
+# Quick way to *temporarily* test CGE on given system.
+#
+# Sets up
+# - FPC from castle-fpc in temp dir
+#   (if CGE_USE_FPC is not set to "path" or "fpcupdeluxe",
+#   see below)
+# - and CGE in $HOME/sources/castle-engine/castle-engine
+#   (could be modified to download CGE each time).
+#
+# Recompiles CGE build tool, adds to $PATH everything required,
+# sets $CASTLE_ENGINE_PATH .
+# Doesn't modify any state outside of temporary directory,
+# doesn't move new build tool to ~/bin/ to avoid changing state that could
+# affect others.
+#
+# Set CGE_USE_FPC to determine used FPC:
+# - CGE_USE_FPC = path : use existing FPC on $PATH.
+# - CGE_USE_FPC = fpcupdeluxe : use existing FPC on $PATH.
+# - CGE_USE_FPC otherwise (or unset) : download FPC from castle-fpc in temp dir.
+#
+# -------------------------------------------------------------------------
+
+case "${CGE_USE_FPC:-}" in
+  'path')
+    echo "Using existing FPC from PATH."
+    command -v fpc || echo "Warning: FPC not found in PATH."
+    ;;
+  fpcupdeluxe)
+    TEMP_CGE=/tmp/cge-$$/
+    echo "Making temporary FPC symlink in ${TEMP_CGE}"
+    mkdir -p "${TEMP_CGE}/bin"
+    pushd "${TEMP_CGE}/bin"
+    ln -s $HOME/installed/fpclazarus/fpc32fixes/fpc/bin/aarch64-darwin/fpc.sh fpc
+    popd
+    export PATH="${TEMP_CGE}/bin:$PATH"
+    ;;
+  *)
+    TEMP_CGE=/tmp/cge-$$/
+    echo "Setting up temporary FPC in ${TEMP_CGE}"
+    mkdir -p "${TEMP_CGE}"
+    pushd "${TEMP_CGE}"
+    git clone https://github.com/castle-engine/castle-build-ci.git \
+      --depth=1 --single-branch --branch=master
+    castle-build-ci/install_dependencies
+    castle-build-ci/setup_castle_engine --install-fpc=true --install-castle-engine=false
+    source setup_castle_engine_env.sh
+    popd
+    ;;
+esac
+
+# Set CASTLE_ENGINE_PATH to use this CGE
+export CASTLE_ENGINE_PATH=$HOME/sources/castle-engine/castle-engine
+
+# rebuild build tool with latest CGE
+mkdir -p "$CASTLE_ENGINE_PATH/bin/"
+# use pushd/popd to preserve pwd
+pushd $CASTLE_ENGINE_PATH
+./tools/build-tool/castle-engine_compile.sh
+mv -f tools/build-tool/castle-engine bin/
+popd
+
+# Use new build tool.
+# Note: In CI account, we deliberately do not move castle-engine to ~/bin/,
+# to not accidentally affect CI builds.
+export PATH="$PATH:$CASTLE_ENGINE_PATH/bin/"
+
+echo 'New build tool in:' `which castle-engine`
+echo 'Engine in:' "$CASTLE_ENGINE_PATH"
+castle-engine --version
