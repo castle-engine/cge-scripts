@@ -1,0 +1,46 @@
+#!/bin/bash
+set -euo pipefail
+
+# ------------------------------------------------------------------------------
+# Upload .ipa file ($1) with qualified id ($2) to my server using SSH,
+# to easily install on test iOS devices.
+#
+# Hint: you can use $(castle-engine output qualified-name-ios) to get
+# the iOS qualified name of current project. So you don't need to hardcode it.
+#
+# Put the IPA on a web server, https, alongside a manifest like this
+# https://github.com/SignTools/ota-me/blob/master/manifest.xml
+# and open with Safari on an iOS device.
+# In case of Michalis, I put this on URL visible below, with a secret part:)
+# ------------------------------------------------------------------------------
+
+UPLOAD_FILE="$1"
+UPLOAD_FILE_BASENAME=$(basename "${UPLOAD_FILE}")
+UPLOAD_TARGET='ios-uploads@michalis.xyz:/home/ios-uploads/uploads/'
+
+QUALIFIED_NAME="$2"
+QUALIFIED_NAME_FILE="/tmp/qualified_name-temp-$$.txt"
+echo "${QUALIFIED_NAME}" > "${QUALIFIED_NAME_FILE}"
+
+scp "${UPLOAD_FILE}" "${UPLOAD_TARGET}"
+scp "${QUALIFIED_NAME_FILE}" "${UPLOAD_TARGET}${UPLOAD_FILE_BASENAME}.qualified_name.txt"
+
+echo "Done uploading:
+- IPA file: ${UPLOAD_FILE}
+- Qualified name: ${QUALIFIED_NAME}
+- Uploaded to: ${UPLOAD_TARGET}"
+
+# Test (you have to set IOS_UPLOADS_SECRET before script runs to see this)
+if [ -n "${IOS_UPLOADS_SECRET}" ]; then
+  TEMP_DIR=/tmp/ios_upload_test_$$
+  mkdir -p "${TEMP_DIR}"
+  wget "https://michalis.xyz/iostest-${IOS_UPLOADS_SECRET}/uploads/${UPLOAD_FILE_BASENAME}" \
+    --quiet --output-document="${TEMP_DIR}/test.ipa"
+  wget "https://michalis.xyz/iostest-${IOS_UPLOADS_SECRET}/uploads/${UPLOAD_FILE_BASENAME}.qualified_name.txt" \
+    --quiet --output-document="${TEMP_DIR}/test.qualified_name.txt"
+  echo "Downloaded test files to ${TEMP_DIR}, comparing"
+  diff "${UPLOAD_FILE}" "${TEMP_DIR}/test.ipa"
+  diff "${QUALIFIED_NAME_FILE}" "${TEMP_DIR}/test.qualified_name.txt"
+  echo "Comparison done, all OK."
+  rm -rf "${TEMP_DIR}"
+fi
