@@ -18,8 +18,15 @@ UPLOAD_FILE="$1"
 UPLOAD_FILE_BASENAME=$(basename "${UPLOAD_FILE}")
 UPLOAD_TARGET='ios-uploads@michalis.xyz:/home/ios-uploads/uploads/'
 
+MY_TEMP=/tmp/
+# On Windows (Cygwin): Make TEMP_DIR path compatible with native tools too,
+# if wget and/or scp are native.
+if command -v cygpath > /dev/null 2>&1; then
+  MY_TEMP="$(cygpath --mixed "${MY_TEMP}")"
+fi
+
 QUALIFIED_NAME="$2"
-QUALIFIED_NAME_FILE="/tmp/qualified_name-temp-$$.txt"
+QUALIFIED_NAME_FILE="${MY_TEMP}qualified_name-temp-$$.txt"
 echo "${QUALIFIED_NAME}" > "${QUALIFIED_NAME_FILE}"
 
 scp "${UPLOAD_FILE}" "${UPLOAD_TARGET}"
@@ -32,7 +39,7 @@ echo "Done uploading:
 
 # Test (you have to set IOS_UPLOADS_SECRET before script runs to see this)
 if [ -n "${IOS_UPLOADS_SECRET}" ]; then
-  TEMP_DIR=/tmp/ios_upload_test_$$
+  TEMP_DIR="${MY_TEMP}ios_upload_test_$$"
   mkdir -p "${TEMP_DIR}"
   wget "https://michalis.xyz/iostest-${IOS_UPLOADS_SECRET}/uploads/${UPLOAD_FILE_BASENAME}" \
     --quiet --output-document="${TEMP_DIR}/test.ipa"
