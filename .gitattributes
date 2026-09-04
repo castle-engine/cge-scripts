@@ -5,3 +5,9 @@
 
 # Even on Windows, shell scripts line endings must be Unix, to work with Cygwin's bash.
 *.sh text eol=lf
+install_fpc_lazarus text eol=lf
+install_fpc_lazarus.config.linux_aarch64 text eol=lf
+ios_upload text eol=lf
+massif_fpc text eol=lf
+repository_cleanup text eol=lf
+temporary_setup_fpc_existing_engine text eol=lf
