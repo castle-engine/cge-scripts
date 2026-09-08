@@ -38,7 +38,7 @@ echo "Done uploading:
 - Uploaded to: ${UPLOAD_TARGET}"
 
 # Test (you have to set IOS_UPLOADS_SECRET before script runs to see this)
-if [ -n "${IOS_UPLOADS_SECRET}" ]; then
+if [ -n "${IOS_UPLOADS_SECRET:-}" ]; then
   TEMP_DIR="${MY_TEMP}ios_upload_test_$$"
   mkdir -p "${TEMP_DIR}"
   wget "https://michalis.xyz/iostest-${IOS_UPLOADS_SECRET}/uploads/${UPLOAD_FILE_BASENAME}" \
@@ -50,4 +50,6 @@ if [ -n "${IOS_UPLOADS_SECRET}" ]; then
   diff "${QUALIFIED_NAME_FILE}" "${TEMP_DIR}/test.qualified_name.txt"
   echo "Comparison done, all OK."
   rm -rf "${TEMP_DIR}"
+else
+  echo "IOS_UPLOADS_SECRET is not set, skipping test."
 fi
